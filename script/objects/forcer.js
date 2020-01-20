@@ -1,4 +1,3 @@
-
 // ==================== CForcer Abstract Class ====================
 var CForcer = function() {
 	this.enabled = true;
@@ -23,13 +22,13 @@ var Gravity = function(g = 9.832) {
 Gravity.prototype = Object.create(CForcer.prototype);
 Gravity.prototype.constructor = Gravity;
 
-Gravity.prototype.__applyForce = function() {
+Gravity.prototype.applyForce = function(p) {
 
 	var j = 0;
 	var zInc = 2;
 
-	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
-		this.s1[PartFLoc + zInc + j] += this.g;
+	for (var i = 0; i < p.partCount; i++, j+=PartObjectSize) {
+		p.s1[PartFLoc + zInc + j] -= this.g;
 	}
 
 }
@@ -44,21 +43,22 @@ var Drag = function(coeff = 0.985) {
 	}
 
 	// Drag coeff only
-	this.coeff = coeff
+	this.revcoeff = 1 - coeff
 
 }
 
 Drag.prototype = Object.create(CForcer.prototype);
 Drag.prototype.constructor = Drag;
-Drag.prototype.__applyForce = function() {
+Drag.prototype.applyForce = function(p) {
 
 	var j = 0;
 
-	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+	for (var i = 0; i < p.partCount; i++, j+=PartObjectSize) {
 		for (var inc = 0; inc < PartDim; inc++) {
 			var tinc = j + inc;
 
-			this.s1[PartFLoc + tinc] *= coeff;
+			// F = ma
+			p.s1[PartFLoc + tinc] -= p.s1[PartMLocSingle + j] * p.s1[PartVelLoc + tinc] * this.revcoeff;
 
 		}
 	}

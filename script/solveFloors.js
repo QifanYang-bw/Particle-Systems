@@ -118,8 +118,10 @@ var FSHADER_SOURCE =
   'void main() {\n' +
   '  float dist = distance(gl_PointCoord, vec2(0.5, 0.5)); \n' +
   '  if(dist < 0.5) { \n' +	
-	'  	gl_FragColor = vec4((1.0-2.0*dist)*v_Color.rgb, 1.0);\n' +
-	'  } else { discard; }\n' +
+	'  	 gl_FragColor = vec4((1.0-2.0*dist)*v_Color.rgb, 1.0); \n' +
+	'  } else { \n' +
+  '    discard; ' + 
+  '  }\n' +
   '}\n';
 // --Each instance computes all the on-screen attributes for just one PIXEL.
 // --Draw large POINTS primitives as ROUND instead of square.  HOW?
@@ -209,10 +211,13 @@ var yMdragTot=0.0;
 var isClear = 1;		// 0 or 1 to enable or disable screen-clearing in the
 //									// draw() function. 'C' or 'c' key toggles in myKeyPress().
 
-function main() {
+var partVec = new PartSys();
+var forceList = [new Gravity(), new Drag()];
+var limitList = [new AxisWall('x', 0.0, '+'), new AxisWall('x', 1.0, '-'),
+                 new AxisWall('y', 0.0, '+'), new AxisWall('y', 1.0, '-'),
+                 new AxisWall('z', 0.0, '+'), new AxisWall('z', 1.0, '-')];
 
-  var testVar = new PartSys();
-  console.log(testVar);
+function main() {
 
 //==============================================================================
   // Retrieve <canvas> element
@@ -257,7 +262,7 @@ function main() {
 	
   // Initialize shaders
   if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
-    console.log('Failed to intialize shaders.');
+    console.log('Failed to initialize shaders.');
     return;
   }
 
@@ -285,10 +290,20 @@ function main() {
 		console.log('Failed to get u_ballPos variable location');
 		return;
 	}
+
+  // ============================= PartSys Init ===================================
+
+  partVec.init(1, forceList, limitList);
+  partVec.setPosition(0, 0, 0, 0);
+  partVec.setMass(0, 1);
+
+  // ==============================================================================
+
 	gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);	// send to gfx system
 	
 	// Display (initial) particle system values on webpage
 	displayMe();
+
 	
   // Quick tutorial on synchronous, real-time animation in JavaScript/HTML-5: 
   //  	http://creativejs.com/resources/requestanimationframe/
@@ -572,6 +587,26 @@ function draw(n) {
 	}
 
 	
+  // ============================= PartSys Update ===================================
+
+  // if (g_stepCount % 5 == 0) {
+
+    // console.log(partVec.s1);
+
+    partVec.applyForces();
+
+    partVec.dotFinder();
+    partVec.solver();
+    partVec.doConstraint();
+    partVec.render();
+    partVec.swap();
+    
+  // }
+
+  xposNow = partVec.s1[0];
+  yposNow = partVec.s1[1];
+
+  // ==============================================================================
 	gl.uniform1i(u_runModeID, g_myRunMode);	// run/step/pause the particle system
 	gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);	// send to gfx system
     
@@ -866,6 +901,8 @@ function myKeyPress(ev) {
 		  g_myRunMode = 3;  // RUN!
 			if(xvelNow > 0.0) xvelNow += INIT_VEL; else xvelNow -= INIT_VEL;
 			if(yvelNow > 0.0) yvelNow += 0.9*INIT_VEL; else yvelNow -= 0.9*INIT_VEL;
+
+      partVec.addVelocityToAll(INIT_VEL, 0.9*INIT_VEL, 0);
 			break;	
 		case 's':
 		case 'S':
@@ -913,9 +950,13 @@ function displayMe() {
    			' m/s; <b>xVel = +/-</b> ' + xvLimit.toFixed(5) + 
    			' m/s;<br><b>timeStep = </b> 1/' + recipTime.toFixed(3) + ' sec' +
    			                ' <b>min:</b> 1/' + recipMin.toFixed(3)  + ' sec' + 
-   			                ' <b>max:</b> 1/' + recipMax.toFixed(3)  + ' sec<br>';
-   			' <b>stepCount: </b>' + g_stepCount.toFixed(3) ;
+   			                ' <b>max:</b> 1/' + recipMax.toFixed(3)  + ' sec<br>' +
+   			'';//' <b>s1Array: </b>' + partVec.s1 ;
+
+    // console.log(partVec.s1);
+
 }
+
 function printBall() {
 //==============================================================================
 // Print current and previous position and velocity on console.
