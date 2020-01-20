@@ -82,15 +82,19 @@
 // Vertex shader program:
 var VSHADER_SOURCE =
   'precision mediump float;\n' +				// req'd in OpenGL ES if we use 'float'
-  //
+  
   'uniform   int u_runMode; \n' +					// particle system state: 
   																				// 0=reset; 1= pause; 2=step; 3=run
   'uniform	 vec4 u_ballShift; \n' +			// single bouncy-ball's movement
+
+  'uniform   mat4 u_MvpMatrix; \n' +
   'attribute vec4 a_Position;\n' +
+
   'varying   vec4 v_Color; \n' +
   'void main() {\n' +
   '  gl_PointSize = 20.0;\n' +            // TRY MAKING THIS LARGER...
-  '	 gl_Position = a_Position + u_ballShift; \n' +	
+  '	 gl_Position = u_MvpMatrix * (a_Position + u_ballShift); \n' +	
+
 	// Let u_runMode determine particle color:
   '  if(u_runMode == 0) { \n' +
 	'	   v_Color = vec4(1.0, 0.0, 0.0, 1.0);	\n' +		// red: 0==reset
@@ -217,6 +221,8 @@ var limitList = [new AxisWall('x', 0.0, '+'), new AxisWall('x', 1.8, '-'),
                  new AxisWall('y', 0.0, '+'), new AxisWall('y', 1.8, '-'),
                  new AxisWall('z', 0.0, '+'), new AxisWall('z', 1.8, '-')];
 
+var u_MvpMatrixID = false;
+
 function main() {
 
 //==============================================================================
@@ -299,7 +305,8 @@ function main() {
 
   // ==============================================================================
 
-	gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);	// send to gfx system
+	// gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);	// send to gfx system
+  u_MvpMatrixID = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
 	
 	// Display (initial) particle system values on webpage
 	displayMe();
@@ -346,271 +353,288 @@ function animate() {
 function draw(n) {
 //============================================================================== 
   // Clear WebGL frame-buffer? (The 'c' or 'C' key toggles isClear between 0 & 1).
-  if(isClear == 1) gl.clear(gl.COLOR_BUFFER_BIT);
-// *** SURPRISE! ***
-//  What happens when you forget (or comment-out) this gl.clear() call?
-// In OpenGL (but not WebGL), you'd see 'trails' of particles caused by drawing 
-// without clearing any previous drawing. But not in WebGL; by default, HTML-5 
-// clears the canvas to white (your browser's default webpage color).  To see 
-// 'trails' in WebGL you must disable the canvas' own screen clearing.  HOW?
-// -- in main() where we create our WebGL drawing context, 
-// replace this (default):
-// -- with this:
-// -- To learn more, see: 
-// https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext
+  if(isClear == 1) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-// // update particle system state?
-//   if(   g_myRunMode > 1) {								// 0=reset; 1= pause; 2=step; 3=run
-// 		if(g_myRunMode == 2) myRunMode=1;			// (if 2, do just one step and pause.)
-// 		//=YES!=========================================
-// 		// Make our 'bouncy-ball' move forward by one timestep, but now the 's' key 
-// 		// will select which kind of solver to use:
-// 		if(g_solver==0) {
-// 		//-----------------------------------------------------------------------
-// 			// EXPLICIT or 'forward time' solver, as found in bouncyBall03.01BAD and
-// 			// bouncyBall04.01badMKS.  CAREFUL! this solver adds energy -- not stable
-// 			// for many particle system settings!
-// 			// This solver looks quite sensible and logical.  Formally, it's an 
-// 			//	explicit or 'forward-time' solver known as the Euler method:
-// 			//			Use the current velocity ('s0dot') to move forward by
-// 			//			one timestep: s1 = s0 + s0dot*h, and
-// 			//		-- Compute the new velocity (e.g. s1dot) too: apply gravity & drag.
-// 			//		-- Then apply constraints: check to see if new position (s1)
-// 			//			is outside our floor, ceiling, or walls, and if new velocity
-// 			//			will move us further in the wrong direction. If so, reverse it!
-// 			// CAREFUL! must convert g_timeStep from milliseconds to seconds!
-// 			xposPrev = xposNow;			// SAVE these values before we update them.
-// 			xvelPrev = xvelNow;			// (for use in constraint-applying code below).
-// 			yposPrev = yposNow;
-// 			yvelPrev = yvelNow;	
-// 			//------------------
-// 			// Compute new position from current position, current velocity, & timestep
-// 			xposNow += xvelNow * (g_timeStep * 0.001);
-// 			yposNow += yvelNow * (g_timeStep * 0.001); 
-// 			// -- apply acceleration due to gravity to current velocity:
-// 			// 					 yvelNow -= (accel. due to gravity)*(timestep in seconds) 
-// 			//									 -= (9.832 meters/sec^2) * (g_timeStep/1000.0);
-// 			yvelNow -= g_grav*(g_timeStep*0.001);
-// 			// -- apply drag: attenuate current velocity:
-// 			xvelNow *= g_drag;
-// 			yvelNow *= g_drag; 
-// 		// We're done!
-// 			//		**BUT***  IT DOESN"T WORK!?!? WHY DOES THE BALL NEVER STOP?
-// 			//	Multiple answers:
-// 			//	1a) Note how easily we can confuse these two cases (bouncyball03 vs 
-// 			//		bouncyball03.01) unless we're extremely careful; one seemingly 
-// 			//		trivial mod to version 03 radically changes bouncyball behavior!
-// 			//		State-variable formulation prevents these confusions by strict 
-// 			//		separation of all parameters of the current state (s0) and the next 
-// 			//		state (s1), with an unambiguous 'swap' operation at the end of our 
-// 			//		animation loop (see lecture notes).
-// 			//	1b) bouncyball03.01 fails by using an 'explicit' solver, but the 
-// 			//		'weirdly out-of-order' bouncyBall03.js works. Why? because 
-// 			//		version03 uses a simple, accidental special case of an 'implicit' or 
-// 			//		'time-reversed' solver: it finds the NEXT timestep's velocity but 
-// 			//		applies it 'backwards in time' -- adds it to the CURRENT position! 
-// 			//				Implicit solvers (we'll learn much more about them soon) will
-// 			//		often work MUCH better that the simple and obvious Euler method (an  
-// 			//		explicit, 'forward-time' solver) because implicit solvers are 
-// 			//		'lossy': their  errors slow down the bouncy ball, cause it to lose 
-// 			//		more energy, acting as a new kind of 'drag' that helps stop the ball.
-// 			//		Conversely, errors from the 'sensible' Euler method always ADD 
-// 			//		energy to the bouncing ball, causing it to keep moving incessantly.
-// 			// 2) BAD CONSTRAINTS: simple velocity reversals aren't enough to 
-// 			//		adequately simulate collisions, bouncing, and resting contact on a 
-// 			//		solid wall or floor.  BOTH bouncyball03 AND bouncyball03.01BAD need 
-// 			//		improvement: read Chapter 7 in your book to learn the multi-step 
-// 			//		process needed, and why state-variable formulation is especially 
-// 			//		helpful.  For example, imagine that in the current timestep (s0) the 
-// 			//		ball is at rest on the floor with zero velocity.  During the time 
-// 			//		between s0 and s1, gravity will accelerate the ball downwards; it 
-// 			//		will 'fall through the floor'; thus our next state s1 is erroneous, 
-// 			//		and we must correct it.  To improve our floor and wall collision 
-// 			//		handling we must: 
-// 			//				1) 'resolve collision' -- in s1, re-position the ball at the 
-// 			//						surface of the floor, and 
-// 			//				2) 'apply impulse' -- in s1, remove the CHANGE in velocity 
-// 			//						caused by erroneous 'fall-through', 
-// 			//		and 3) 'bounce' -- reverse the velocity that remains, moving the
-// 			//						particle away from the collision at a velocity scaled by the 
-// 			//						floor's bouncy-ness (coefficient of restitution; see book).
-// 		}
-// 		else if(g_solver==1) {
-// 		//------------------------------------------------------------------------
-// 			// IMPLICIT or 'reverse time' solver, as found in bouncyBall04.goodMKS;
-// 			// This category of solver is often better, more stable, but lossy.
-// 			// -- apply acceleration due to gravity to current velocity:
-// 			//				  yvelNow -= (accel. due to gravity)*(g_timestep in seconds) 
-// 			//                  -= (9.832 meters/sec^2) * (g_timeStep/1000.0);
-// 			xposPrev = xposNow;			// SAVE these values before we update them.
-// 			xvelPrev = xvelNow;			// (for use in constraint-applying code below).
-// 			yposPrev = yposNow;
-// 			yvelPrev = yvelNow;
-// 			//-------------------
-// 			yvelNow -= g_grav*(g_timeStep*0.001);
-// 			// -- apply drag: attenuate current velocity:
-// 			xvelNow *= g_drag;
-// 			yvelNow *= g_drag;
-// 			// -- move our particle using current velocity:
-// 			// CAREFUL! must convert g_timeStep from milliseconds to seconds!
-// 			xposNow += xvelNow * (g_timeStep * 0.001);
-// 			yposNow += yvelNow * (g_timeStep * 0.001); 
-// 			// What's the result of this rearrangement?
-// 			//	IT WORKS BEAUTIFULLY! much more stable much more often...
-// 		}
-// 		else {
-// 			console.log('?!?! unknown solver: g_solver==' + g_solver);
-// 			return;
-// 		}
+  {
+    // *** SURPRISE! ***
+    //  What happens when you forget (or comment-out) this gl.clear() call?
+    // In OpenGL (but not WebGL), you'd see 'trails' of particles caused by drawing 
+    // without clearing any previous drawing. But not in WebGL; by default, HTML-5 
+    // clears the canvas to white (your browser's default webpage color).  To see 
+    // 'trails' in WebGL you must disable the canvas' own screen clearing.  HOW?
+    // -- in main() where we create our WebGL drawing context, 
+    // replace this (default):
+    // -- with this:
+    // -- To learn more, see: 
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext
 
-// 		//==========================================================================
-// 		// CONSTRAINTS -- 'bounce' our ball off floor & walls at (0,0), (1.8, 1.8):
-// 		// where g_bounce selects constraint type:
-// 		// ==0 for simple velocity-reversal, as in all previous versions
-// 		// ==1 for Chapter 7's collision resolution method, which uses an 'impulse' 
-// 		//      to cancel any velocity boost caused by falling below the floor.
-// 		if(g_bounce==0) { //--------------------------------------------------------
-// 			if(      xposNow < 0.0 && xvelNow < 0.0			// simple velocity-reversal
-// 			) {		// bounce on left wall.
-// 				xvelNow = -g_resti*xvelNow;
-// 			}
-// 			else if (xposNow > 1.8 && xvelNow > 0.0
-// 			) {		// bounce on right wall
-// 				xvelNow = -g_resti*xvelNow;
-// 			}
-// 			if(      yposNow < 0.0 && yvelNow < 0.0
-// 			) {		// bounce on floor
-// 				yvelNow = -g_resti*yvelNow;
-// 			}
-// 			else if( yposNow > 1.8 && yvelNow > 0.0
-// 			) {		// bounce on ceiling
-// 				yvelNow = -g_resti*yvelNow;
-// 			}
-// 			//  -- hard limit on 'floor' keeps y position >= 0;
-// 			if(yposNow < 0.0) yposNow = 0.0;
-// 		}
-// 		else if (g_bounce==1) { //---------------------------------------------------------------------------
-// 			if(      xposNow < 0.0 && xvelNow < 0.0 // collision!  left wall...
-// 			) {		// bounce on left wall.
+    // // update particle system state?
+    //   if(   g_myRunMode > 1) {								// 0=reset; 1= pause; 2=step; 3=run
+    // 		if(g_myRunMode == 2) myRunMode=1;			// (if 2, do just one step and pause.)
+    // 		//=YES!=========================================
+    // 		// Make our 'bouncy-ball' move forward by one timestep, but now the 's' key 
+    // 		// will select which kind of solver to use:
+    // 		if(g_solver==0) {
+    // 		//-----------------------------------------------------------------------
+    // 			// EXPLICIT or 'forward time' solver, as found in bouncyBall03.01BAD and
+    // 			// bouncyBall04.01badMKS.  CAREFUL! this solver adds energy -- not stable
+    // 			// for many particle system settings!
+    // 			// This solver looks quite sensible and logical.  Formally, it's an 
+    // 			//	explicit or 'forward-time' solver known as the Euler method:
+    // 			//			Use the current velocity ('s0dot') to move forward by
+    // 			//			one timestep: s1 = s0 + s0dot*h, and
+    // 			//		-- Compute the new velocity (e.g. s1dot) too: apply gravity & drag.
+    // 			//		-- Then apply constraints: check to see if new position (s1)
+    // 			//			is outside our floor, ceiling, or walls, and if new velocity
+    // 			//			will move us further in the wrong direction. If so, reverse it!
+    // 			// CAREFUL! must convert g_timeStep from milliseconds to seconds!
+    // 			xposPrev = xposNow;			// SAVE these values before we update them.
+    // 			xvelPrev = xvelNow;			// (for use in constraint-applying code below).
+    // 			yposPrev = yposNow;
+    // 			yvelPrev = yvelNow;	
+    // 			//------------------
+    // 			// Compute new position from current position, current velocity, & timestep
+    // 			xposNow += xvelNow * (g_timeStep * 0.001);
+    // 			yposNow += yvelNow * (g_timeStep * 0.001); 
+    // 			// -- apply acceleration due to gravity to current velocity:
+    // 			// 					 yvelNow -= (accel. due to gravity)*(timestep in seconds) 
+    // 			//									 -= (9.832 meters/sec^2) * (g_timeStep/1000.0);
+    // 			yvelNow -= g_grav*(g_timeStep*0.001);
+    // 			// -- apply drag: attenuate current velocity:
+    // 			xvelNow *= g_drag;
+    // 			yvelNow *= g_drag; 
+    // 		// We're done!
+    // 			//		**BUT***  IT DOESN"T WORK!?!? WHY DOES THE BALL NEVER STOP?
+    // 			//	Multiple answers:
+    // 			//	1a) Note how easily we can confuse these two cases (bouncyball03 vs 
+    // 			//		bouncyball03.01) unless we're extremely careful; one seemingly 
+    // 			//		trivial mod to version 03 radically changes bouncyball behavior!
+    // 			//		State-variable formulation prevents these confusions by strict 
+    // 			//		separation of all parameters of the current state (s0) and the next 
+    // 			//		state (s1), with an unambiguous 'swap' operation at the end of our 
+    // 			//		animation loop (see lecture notes).
+    // 			//	1b) bouncyball03.01 fails by using an 'explicit' solver, but the 
+    // 			//		'weirdly out-of-order' bouncyBall03.js works. Why? because 
+    // 			//		version03 uses a simple, accidental special case of an 'implicit' or 
+    // 			//		'time-reversed' solver: it finds the NEXT timestep's velocity but 
+    // 			//		applies it 'backwards in time' -- adds it to the CURRENT position! 
+    // 			//				Implicit solvers (we'll learn much more about them soon) will
+    // 			//		often work MUCH better that the simple and obvious Euler method (an  
+    // 			//		explicit, 'forward-time' solver) because implicit solvers are 
+    // 			//		'lossy': their  errors slow down the bouncy ball, cause it to lose 
+    // 			//		more energy, acting as a new kind of 'drag' that helps stop the ball.
+    // 			//		Conversely, errors from the 'sensible' Euler method always ADD 
+    // 			//		energy to the bouncing ball, causing it to keep moving incessantly.
+    // 			// 2) BAD CONSTRAINTS: simple velocity reversals aren't enough to 
+    // 			//		adequately simulate collisions, bouncing, and resting contact on a 
+    // 			//		solid wall or floor.  BOTH bouncyball03 AND bouncyball03.01BAD need 
+    // 			//		improvement: read Chapter 7 in your book to learn the multi-step 
+    // 			//		process needed, and why state-variable formulation is especially 
+    // 			//		helpful.  For example, imagine that in the current timestep (s0) the 
+    // 			//		ball is at rest on the floor with zero velocity.  During the time 
+    // 			//		between s0 and s1, gravity will accelerate the ball downwards; it 
+    // 			//		will 'fall through the floor'; thus our next state s1 is erroneous, 
+    // 			//		and we must correct it.  To improve our floor and wall collision 
+    // 			//		handling we must: 
+    // 			//				1) 'resolve collision' -- in s1, re-position the ball at the 
+    // 			//						surface of the floor, and 
+    // 			//				2) 'apply impulse' -- in s1, remove the CHANGE in velocity 
+    // 			//						caused by erroneous 'fall-through', 
+    // 			//		and 3) 'bounce' -- reverse the velocity that remains, moving the
+    // 			//						particle away from the collision at a velocity scaled by the 
+    // 			//						floor's bouncy-ness (coefficient of restitution; see book).
+    // 		}
+    // 		else if(g_solver==1) {
+    // 		//------------------------------------------------------------------------
+    // 			// IMPLICIT or 'reverse time' solver, as found in bouncyBall04.goodMKS;
+    // 			// This category of solver is often better, more stable, but lossy.
+    // 			// -- apply acceleration due to gravity to current velocity:
+    // 			//				  yvelNow -= (accel. due to gravity)*(g_timestep in seconds) 
+    // 			//                  -= (9.832 meters/sec^2) * (g_timeStep/1000.0);
+    // 			xposPrev = xposNow;			// SAVE these values before we update them.
+    // 			xvelPrev = xvelNow;			// (for use in constraint-applying code below).
+    // 			yposPrev = yposNow;
+    // 			yvelPrev = yvelNow;
+    // 			//-------------------
+    // 			yvelNow -= g_grav*(g_timeStep*0.001);
+    // 			// -- apply drag: attenuate current velocity:
+    // 			xvelNow *= g_drag;
+    // 			yvelNow *= g_drag;
+    // 			// -- move our particle using current velocity:
+    // 			// CAREFUL! must convert g_timeStep from milliseconds to seconds!
+    // 			xposNow += xvelNow * (g_timeStep * 0.001);
+    // 			yposNow += yvelNow * (g_timeStep * 0.001); 
+    // 			// What's the result of this rearrangement?
+    // 			//	IT WORKS BEAUTIFULLY! much more stable much more often...
+    // 		}
+    // 		else {
+    // 			console.log('?!?! unknown solver: g_solver==' + g_solver);
+    // 			return;
+    // 		}
 
-// 				xposNow = 0.0;
+    // 		//==========================================================================
+    // 		// CONSTRAINTS -- 'bounce' our ball off floor & walls at (0,0), (1.8, 1.8):
+    // 		// where g_bounce selects constraint type:
+    // 		// ==0 for simple velocity-reversal, as in all previous versions
+    // 		// ==1 for Chapter 7's collision resolution method, which uses an 'impulse' 
+    // 		//      to cancel any velocity boost caused by falling below the floor.
+    // 		if(g_bounce==0) { //--------------------------------------------------------
+    // 			if(      xposNow < 0.0 && xvelNow < 0.0			// simple velocity-reversal
+    // 			) {		// bounce on left wall.
+    // 				xvelNow = -g_resti*xvelNow;
+    // 			}
+    // 			else if (xposNow > 1.8 && xvelNow > 0.0
+    // 			) {		// bounce on right wall
+    // 				xvelNow = -g_resti*xvelNow;
+    // 			}
+    // 			if(      yposNow < 0.0 && yvelNow < 0.0
+    // 			) {		// bounce on floor
+    // 				yvelNow = -g_resti*yvelNow;
+    // 			}
+    // 			else if( yposNow > 1.8 && yvelNow > 0.0
+    // 			) {		// bounce on ceiling
+    // 				yvelNow = -g_resti*yvelNow;
+    // 			}
+    // 			//  -- hard limit on 'floor' keeps y position >= 0;
+    // 			if(yposNow < 0.0) yposNow = 0.0;
+    // 		}
+    // 		else if (g_bounce==1) { //---------------------------------------------------------------------------
+    // 			if(      xposNow < 0.0 && xvelNow < 0.0 // collision!  left wall...
+    // 			) {		// bounce on left wall.
 
-// 				xvelNow = xvelPrev;
-// 				xvelNow *= g_drag;
+    // 				xposNow = 0.0;
 
-// 				if(xvelNow < 0.0) xvelNow = -g_resti*xvelNow; // no sign change--bounce!
-// 				else xvelNow = g_resti*xvelNow;			// sign changed-- don't need another.
+    // 				xvelNow = xvelPrev;
+    // 				xvelNow *= g_drag;
 
-// 			}
-// 			else if (xposNow > 1.8 && xvelNow > 0.0		// collision! right wall...
-// 			) {		// bounce on right wall
+    // 				if(xvelNow < 0.0) xvelNow = -g_resti*xvelNow; // no sign change--bounce!
+    // 				else xvelNow = g_resti*xvelNow;			// sign changed-- don't need another.
 
-// 				xposNow = 1.8;
+    // 			}
+    // 			else if (xposNow > 1.8 && xvelNow > 0.0		// collision! right wall...
+    // 			) {		// bounce on right wall
 
-// 				xvelNow = xvelPrev; 
-// 				xvelNow *= g_drag;
+    // 				xposNow = 1.8;
 
-// 				if(xvelNow > 0.0) xvelNow = -g_resti*xvelNow; // no sign change--bounce!
-// 				else xvelNow = g_resti*xvelNow;			// sign changed-- don't need another.
+    // 				xvelNow = xvelPrev; 
+    // 				xvelNow *= g_drag;
 
-// 			}
-// 			if(      yposNow < 0.0 && yvelNow < 0.0		// collision! floor...
-// 			) {		// bounce on floor
-// /*
-// 				// Diagnostic printing.  This revealed 'VERY SUBTLE PROBLEM' shown below.
-// 				console.log('y<0 bounce: '+ g_stepCount +'-(BEFORE)------------------');
-// 				console.log(' x,yPos_Prev: (' + //xposPrev.toFixed(3) + 
-// 										'Xpos0, ' + yposPrev.toFixed(3) + ') x,yVel_Prev: (' + 
-// 										//xvelPrev.toFixed(3) + 
-// 										'Xvel0, ' + yvelPrev.toFixed(3) + ');');
-// 										console.log(' x,yPos_Now : (' + 
-// 										//xposNow.toFixed(3) + 
-// 										'Xpos1, ' + yposNow.toFixed(3) + ') x,yVel_Now : (' + 
-// 										// xvelNow.toFixed(3) + 
-// 										'xVel1, ' + yvelNow.toFixed(3) + ');');
-// */
-// 				yposNow = 0.0;					// 1) resolve contact: put particle at wall.
-// 																// 2) remove all y velocity gained from forces as
-// 																// ball moved thru floor in this timestep. HOW?
-// 																// Assume ball reached floor at START of
-// 																// the timestep, thus: return to the orig.
-// 				yvelNow = yvelPrev;			// velocity we had at the start of timestep; 
-// 				yvelNow *= g_drag;			// **BUT** reduced by drag (and any other forces 
-// 																// 	that still apply during this timestep).
-// 																// 3) BOUNCE:  
-// 																//reversed velocity*coeff-of-restitution.
-// 				// ATTENTION! VERY SUBTLE PROBLEM HERE! ------------------------------
-// 				//Balls with tiny, near-zero velocities (e.g. ball nearly at rest on 
-// 				// floor) can easily reverse sign between 'previous' and 'now' 
-// 				// timesteps, even for negligible forces.  Put another way:
-// 				// Step 2), our 'repair' attempt that removes all erroneous x velocity, 
-// 				// has CHANGED the 'now' ball velocity, and MAY have changed its sign as 
-// 				// well,  especially when the ball is nearly at rest. SUBTLE: THUS we 
-// 				// need a velocity-sign test here that ensures the 'bounce' step will 
-// 				// always send the ball outwards, away from its wall or floor collision. 
-// 				if(yvelNow < 0.0) yvelNow = -g_resti*yvelNow; // no sign change--bounce!
-// 				else yvelNow = g_resti*yvelNow;			// sign changed-- don't need another.
-// /*
-// 				// Diagnostic printing.  This revealed 'VERY SUBTLE PROBLEM' shown below.
-// 				console.log('y<0 bounce (AFTER)----');
-// 				console.log(' x,yPos_Prev: (' + //xposPrev.toFixed(3) + 
-// 										'Xpos0, ' + yposPrev.toFixed(3) + ') x,yVel_Prev: (' + 
-// 										//xvelPrev.toFixed(3) + 
-// 										'Xvel0, ' + yvelPrev.toFixed(3) + ');');
-// 										console.log(' x,yPos_Now : (' + 
-// 										//xposNow.toFixed(3) + 
-// 										'Xpos1, ' + yposNow.toFixed(3) + ') x,yVel_Now : (' + 
-// 										// xvelNow.toFixed(3) + 
-// 										'xVel1, ' + yvelNow.toFixed(3) + ');');
-// */			
-// 			}
-// 			else if( yposNow > 1.8 && yvelNow > 0.0 		// collision! ceiling...
-// 			) {		// bounce on ceiling
+    // 				if(xvelNow > 0.0) xvelNow = -g_resti*xvelNow; // no sign change--bounce!
+    // 				else xvelNow = g_resti*xvelNow;			// sign changed-- don't need another.
 
-// 				yposNow = 1.8;
+    // 			}
+    // 			if(      yposNow < 0.0 && yvelNow < 0.0		// collision! floor...
+    // 			) {		// bounce on floor
+    // /*
+    // 				// Diagnostic printing.  This revealed 'VERY SUBTLE PROBLEM' shown below.
+    // 				console.log('y<0 bounce: '+ g_stepCount +'-(BEFORE)------------------');
+    // 				console.log(' x,yPos_Prev: (' + //xposPrev.toFixed(3) + 
+    // 										'Xpos0, ' + yposPrev.toFixed(3) + ') x,yVel_Prev: (' + 
+    // 										//xvelPrev.toFixed(3) + 
+    // 										'Xvel0, ' + yvelPrev.toFixed(3) + ');');
+    // 										console.log(' x,yPos_Now : (' + 
+    // 										//xposNow.toFixed(3) + 
+    // 										'Xpos1, ' + yposNow.toFixed(3) + ') x,yVel_Now : (' + 
+    // 										// xvelNow.toFixed(3) + 
+    // 										'xVel1, ' + yvelNow.toFixed(3) + ');');
+    // */
+    // 				yposNow = 0.0;					// 1) resolve contact: put particle at wall.
+    // 																// 2) remove all y velocity gained from forces as
+    // 																// ball moved thru floor in this timestep. HOW?
+    // 																// Assume ball reached floor at START of
+    // 																// the timestep, thus: return to the orig.
+    // 				yvelNow = yvelPrev;			// velocity we had at the start of timestep; 
+    // 				yvelNow *= g_drag;			// **BUT** reduced by drag (and any other forces 
+    // 																// 	that still apply during this timestep).
+    // 																// 3) BOUNCE:  
+    // 																//reversed velocity*coeff-of-restitution.
+    // 				// ATTENTION! VERY SUBTLE PROBLEM HERE! ------------------------------
+    // 				//Balls with tiny, near-zero velocities (e.g. ball nearly at rest on 
+    // 				// floor) can easily reverse sign between 'previous' and 'now' 
+    // 				// timesteps, even for negligible forces.  Put another way:
+    // 				// Step 2), our 'repair' attempt that removes all erroneous x velocity, 
+    // 				// has CHANGED the 'now' ball velocity, and MAY have changed its sign as 
+    // 				// well,  especially when the ball is nearly at rest. SUBTLE: THUS we 
+    // 				// need a velocity-sign test here that ensures the 'bounce' step will 
+    // 				// always send the ball outwards, away from its wall or floor collision. 
+    // 				if(yvelNow < 0.0) yvelNow = -g_resti*yvelNow; // no sign change--bounce!
+    // 				else yvelNow = g_resti*yvelNow;			// sign changed-- don't need another.
+    // /*
+    // 				// Diagnostic printing.  This revealed 'VERY SUBTLE PROBLEM' shown below.
+    // 				console.log('y<0 bounce (AFTER)----');
+    // 				console.log(' x,yPos_Prev: (' + //xposPrev.toFixed(3) + 
+    // 										'Xpos0, ' + yposPrev.toFixed(3) + ') x,yVel_Prev: (' + 
+    // 										//xvelPrev.toFixed(3) + 
+    // 										'Xvel0, ' + yvelPrev.toFixed(3) + ');');
+    // 										console.log(' x,yPos_Now : (' + 
+    // 										//xposNow.toFixed(3) + 
+    // 										'Xpos1, ' + yposNow.toFixed(3) + ') x,yVel_Now : (' + 
+    // 										// xvelNow.toFixed(3) + 
+    // 										'xVel1, ' + yvelNow.toFixed(3) + ');');
+    // */			
+    // 			}
+    // 			else if( yposNow > 1.8 && yvelNow > 0.0 		// collision! ceiling...
+    // 			) {		// bounce on ceiling
 
-// 				yvelNow = yvelPrev;
-// 				yvelNow *= g_drag; 
- 
-// 				if(yvelNow > 0.0) yvelNow = -g_resti*yvelNow; // no sign change--bounce!
-// 				else yvelNow = g_resti*yvelNow;			// sign changed-- don't need another.
+    // 				yposNow = 1.8;
 
-// 			}
-// 		}
-// 		else {
-// 			console.log('?!?! unknown constraint: g_bounce==' + g_bounce);
-// 			return;
-// 		}
+    // 				yvelNow = yvelPrev;
+    // 				yvelNow *= g_drag; 
+     
+    // 				if(yvelNow > 0.0) yvelNow = -g_resti*yvelNow; // no sign change--bounce!
+    // 				else yvelNow = g_resti*yvelNow;			// sign changed-- don't need another.
 
-// 		displayMe();				// Display particle-system status on-screen.
-// 		//============================================
-// 	}
+    // 			}
+    // 		}
+    // 		else {
+    // 			console.log('?!?! unknown constraint: g_bounce==' + g_bounce);
+    // 			return;
+    // 		}
 
+    // 		displayMe();				// Display particle-system status on-screen.
+    // 		//============================================
+    // 	}
+  }
 	
   // ============================= PartSys Update ===================================
 
-  // if (g_stepCount % 5 == 0) {
+  // console.log(partVec.s1);
 
-    // console.log(partVec.s1);
+  partVec.applyForces();
 
-    partVec.applyForces();
-
-    partVec.dotFinder();
-    partVec.solver();
-    partVec.doConstraint();
-    partVec.render();
-    partVec.swap();
+  partVec.dotFinder();
+  partVec.solver();
+  partVec.doConstraint();
+  partVec.render();
+  partVec.swap();
     
-  // }
 
   xposNow = partVec.s1[0];
   yposNow = partVec.s1[1];
   xvelNow = partVec.s1[3];
   yvelNow = partVec.s1[4];
 
-   displayMe();        // Display particle-system status on-screen.
+  displayMe();        // Display particle-system status on-screen.
 
   // ==============================================================================
+
+
+  // ========================= Set Up Perspective Camera =========================
+  gl.viewport(0,0,g_canvas.width, g_canvas.height);
+  var mMatrix = new Matrix4();
+  
+  // FOV = 30 deg
+  mMatrix.perspective(30.0,   // FOVY: top-to-bottom vertical image angle, in degrees
+                      (g_canvas.width)/g_canvas.height,   // Image Aspect Ratio: camera lens width/height
+                      1.0,   // camera z-near distance (always positive; frustum begins at z = -znear)
+                      1000.0);  // camera z-far distance (always positive; frustum ends at z = -zfar)
+  
+  mMatrix.lookAt(eyeX,  eyeY,  eyeZ,     // center of projection
+                 lookAtX, lookAtY, lookAtZ,  // look-at point 
+                 0,  0,  1);
+
+  gl.uniformMatrix4fv(u_MvpMatrixID, false, mMatrix.elements);
+
 	gl.uniform1i(u_runModeID, g_myRunMode);	// run/step/pause the particle system
 	gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);	// send to gfx system
     
@@ -673,311 +697,4 @@ function initVertexBuffers() {
   // Enable this assignment of the bound buffer to the a_Position variable:
   gl.enableVertexAttribArray(a_PositionID);
   return vcount;
-}
-
-//===================Mouse and Keyboard event-handling Callbacks================
-//==============================================================================
-function myMouseDown(ev) {
-//==============================================================================
-// Called when user PRESSES down any mouse button;
-// 									(Which button?    console.log('ev.button='+ev.button);   )
-// 		ev.clientX, ev.clientY == mouse pointer location, but measured in webpage 
-//		pixels: left-handed coords; UPPER left origin; Y increases DOWNWARDS (!)  
-
-// Create right-handed 'pixel' coords with origin at WebGL canvas LOWER left;
-  var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
-  var xp = ev.clientX - rect.left;									  // x==0 at canvas left edge
-  var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
-//  console.log('myMouseDown(pixel coords): xp,yp=\t',xp,',\t',yp);
-  
-	// Convert to Canonical View Volume (CVV) coordinates too:
-  var x = (xp - g_canvas.width/2)  / 		// move origin to center of canvas and
-  						 (g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
-	var y = (yp - g_canvas.height/2) /		//										 -1 <= y < +1.
-							 (g_canvas.height/2);
-//	console.log('myMouseDown(CVV coords  ):  x, y=\t',x,',\t',y);
-	
-	isDrag = true;											// set our mouse-dragging flag
-	xMclik = x;													// record where mouse-dragging began
-	yMclik = y;
-		document.getElementById('MouseResult1').innerHTML = 
-	'myMouseDown() at CVV coords x,y = '+x+', '+y+'<br>';
-};
-
-
-function myMouseMove(ev) {
-//==============================================================================
-// Called when user MOVES the mouse with a button already pressed down.
-// 									(Which button?   console.log('ev.button='+ev.button);    )
-// 		ev.clientX, ev.clientY == mouse pointer location, but measured in webpage 
-//		pixels: left-handed coords; UPPER left origin; Y increases DOWNWARDS (!)  
-
-	if(isDrag==false) return;				// IGNORE all mouse-moves except 'dragging'
-
-	// Create right-handed 'pixel' coords with origin at WebGL canvas LOWER left;
-  var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
-  var xp = ev.clientX - rect.left;									  // x==0 at canvas left edge
-	var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
-//  console.log('myMouseMove(pixel coords): xp,yp=\t',xp,',\t',yp);
-  
-	// Convert to Canonical View Volume (CVV) coordinates too:
-  var x = (xp - g_canvas.width/2)  / 		// move origin to center of canvas and
-  						 (g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
-	var y = (yp - g_canvas.height/2) /		//										 -1 <= y < +1.
-							 (g_canvas.height/2);
-//	console.log('myMouseMove(CVV coords  ):  x, y=\t',x,',\t',y);
-
-	// find how far we dragged the mouse:
-	xMdragTot += (x - xMclik);					// Accumulate change-in-mouse-position,&
-	yMdragTot += (y - yMclik);
-	xMclik = x;													// Make next drag-measurement from here.
-	yMclik = y;
-// (? why no 'document.getElementById() call here, as we did for myMouseDown()
-// and myMouseUp()? Because the webpage doesn't get updated when we move the 
-// mouse. Put the web-page updating command in the 'draw()' function instead)
-};
-
-function myMouseUp(ev) {
-//==============================================================================
-// Called when user RELEASES mouse button pressed previously.
-// 									(Which button?   console.log('ev.button='+ev.button);    )
-// 		ev.clientX, ev.clientY == mouse pointer location, but measured in webpage 
-//		pixels: left-handed coords; UPPER left origin; Y increases DOWNWARDS (!)  
-
-// Create right-handed 'pixel' coords with origin at WebGL canvas LOWER left;
-  var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
-  var xp = ev.clientX - rect.left;									  // x==0 at canvas left edge
-	var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
-//  console.log('myMouseUp  (pixel coords): xp,yp=\t',xp,',\t',yp);
-  
-	// Convert to Canonical View Volume (CVV) coordinates too:
-  var x = (xp - g_canvas.width/2)  / 		// move origin to center of canvas and
-  						 (g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
-	var y = (yp - g_canvas.height/2) /		//										 -1 <= y < +1.
-							 (g_canvas.height/2);
-	console.log('myMouseUp  (CVV coords  ):  x, y=\t',x,',\t',y);
-	
-	isDrag = false;											// CLEAR our mouse-dragging flag, and
-	// accumulate any final bit of mouse-dragging we did:
-	xMdragTot += (x - xMclik);
-	yMdragTot += (y - yMclik);
-	console.log('myMouseUp: xMdragTot,yMdragTot =',xMdragTot,',\t',yMdragTot);
-	// Put it on our webpage too...
-	document.getElementById('MouseResult1').innerHTML = 
-	'myMouseUp(       ) at CVV coords x,y = '+x+', '+y+'<br>';
-};
-
-
-function myKeyDown(ev) {
-//==============================================================================
-// Called when user presses down ANY key on the keyboard, and captures the 
-// keyboard's scancode or keycode (varies for different countries and alphabets).
-//  CAUTION: You may wish to avoid 'keydown' and 'keyup' events: if you DON'T 
-// need to sense non-ASCII keys (arrow keys, function keys, pgUp, pgDn, Ins, 
-// Del, etc), then just use the 'keypress' event instead.
-//	 The 'keypress' event captures the combined effects of alphanumeric keys and 
-// the SHIFT, ALT, and CTRL modifiers.  It translates pressed keys into ordinary
-// ASCII codes; you'll get uppercase 'S' if you hold shift and press the 's' key.
-//
-// For a light, easy explanation of keyboard events in JavaScript,
-// see:    http://www.kirupa.com/html5/keyboard_events_in_javascript.htm
-// For a thorough explanation of the messy way JavaScript handles keyboard events
-// see:    http://javascript.info/tutorial/keyboard-events
-//
-
-/*
-	switch(ev.keyCode) {			// keycodes !=ASCII, but are very consistent for 
-	//	nearly all non-alphanumeric keys for nearly all keyboards in all countries.
-		case 37:		// left-arrow key
-			// print in console:
-			console.log(' left-arrow.');
-			// and print on webpage in the <div> element with id='Result':
-  		document.getElementById('KeyResult').innerHTML =
-  			' Left Arrow:keyCode='+ev.keyCode;
-			break;
-		case 38:		// up-arrow key
-			console.log('   up-arrow.');
-  		document.getElementById('KeyResult').innerHTML =
-  			'   Up Arrow:keyCode='+ev.keyCode;
-			break;
-		case 39:		// right-arrow key
-			console.log('right-arrow.');
-  		document.getElementById('KeyResult').innerHTML =
-  			'Right Arrow:keyCode='+ev.keyCode;
-  		break;
-		case 40:		// down-arrow key
-			console.log(' down-arrow.');
-  		document.getElementById('KeyResult').innerHTML =
-  			' Down Arrow:keyCode='+ev.keyCode;
-  		break;
-		default:
-			console.log('myKeyDown()--keycode=', ev.keyCode, ', charCode=', ev.charCode);
-  		document.getElementById('KeyResult').innerHTML =
-  			'myKeyDown()--keyCode='+ev.keyCode;
-			break;
-	}
-*/
-}
-
-function myKeyUp(ev) {
-//==============================================================================
-// Called when user releases ANY key on the keyboard; captures scancodes well
-// You probably don't want to use this ('myKeyDown()' explains why); you'll find
-// myKeyPress() can handle nearly all your keyboard-interface needs.
-/*
-	console.log('myKeyUp()--keyCode='+ev.keyCode+' released.');
-*/
-}
-
-function myKeyPress(ev) {
-//==============================================================================
-// Best for capturing alphanumeric keys and key-combinations such as 
-// CTRL-C, alt-F, SHIFT-4, etc.  Use this instead of myKeyDown(), myKeyUp() if
-// you don't need to respond separately to key-down and key-up events.
-/*
-	// Report EVERYTHING about this pressed key in the console:
-	console.log('myKeyPress():keyCode='+ev.keyCode  +', charCode=' +ev.charCode+
-												', shift='    +ev.shiftKey + ', ctrl='    +ev.ctrlKey +
-												', altKey='   +ev.altKey   +
-												', metaKey(Command key or Windows key)='+ev.metaKey);
-*/
-  // RESET our g_timeStep min/max recorder:
-  g_timeStepMin = g_timeStep;
-  g_timeStepMax = g_timeStep;
-	myChar = String.fromCharCode(ev.keyCode);	//	convert code to character-string
-	// Report EVERYTHING about this pressed key in the webpage 
-	// in the <div> element with id='Result':r 
-/*  document.getElementById('KeyResult').innerHTML = 
-   			'char= ' 		 	+ myChar 			+ ', keyCode= '+ ev.keyCode 	+ 
-   			', charCode= '+ ev.charCode + ', shift= '	 + ev.shiftKey 	+ 
-   			', ctrl= '		+ ev.shiftKey + ', altKey= ' + ev.altKey 		+ 
-   			', metaKey= '	+ ev.metaKey 	+ '<br>' ;
-*/  			
-  // update particle system state? g_myRunMode 0=reset; 1= pause; 2=step; 3=run
-	switch(myChar) {
-		case '0':	
-			g_myRunMode = 0;			// RESET!
-			break;
-		case '1':
-			g_myRunMode = 1;			// PAUSE!
-			break;
-		case '2':
-			g_myRunMode = 2;			// STEP!
-			break;
-		case '3':							// RUN!
-			g_myRunMode = 3;
-			break;
-		case 'b':							// Toggle floor-bounce constraint type:
-		case 'B':
-			if(g_bounce==0) g_bounce = 1;
-			else g_bounce = 0;
-			break;
-		case 'c':					// 'c' or 'C' key:  toggle screen clearing
-		case 'C':					// to demonstrate 'trails'.
-			if(isClear == 0) isClear = 1;
-			else isClear = 0;
-			break;
-		case 'd':			// REDUCE drag;  make velocity scale factor rise towards 1.0
-			g_drag *= 1.0 / 0.995; 
-			if(g_drag > 1.0) g_drag = 1.0;	// don't allow drag to ADD energy!
-			break;
-		case 'D':			// INCREASE drag: make velocity scale factor a smaller fraction
-			g_drag *= 0.995;				
-			break;
-		case 'g':			// REDUCE gravity
-			g_grav *= 0.99;		// shrink 1%
-			break;
-		case 'G':
-			g_grav *= 1.0/0.98;	// grow by 2%
-			break;
-		case 'm':
-			g_mass *= 0.98;		// reduce mass by 2%
-			break;
-		case 'M':
-			g_mass *= 1.0/0.98;	// increase mass by 2%
-			break;
-		case 'R':  // HARD reset: position AND velocity.
-		  g_myRunMode = 0;			// RESET!
-			xposNow =  0.0;				yposNow =  0.0;				zposNow =  0.0;	
-			xvelNow =  INIT_VEL;	yvelNow =  INIT_VEL;	zvelNow =  0.0;
-			break;
-		case 'r':		// 'refresh' -- boost velocity only; return to 'run'
-		  g_myRunMode = 3;  // RUN!
-			if(xvelNow > 0.0) xvelNow += INIT_VEL; else xvelNow -= INIT_VEL;
-			if(yvelNow > 0.0) yvelNow += 0.9*INIT_VEL; else yvelNow -= 0.9*INIT_VEL;
-
-      partVec.addVelocityToAll(INIT_VEL, 0.9*INIT_VEL, 0);
-			break;	
-		case 's':
-		case 'S':
-			// switch to a different solver:
-			if(g_solver == 0) g_solver = 1;
-			else g_solver = 0;
-			break;
-		case 'p':
-		case 'P':			// toggle pause/run:
-			if(g_myRunMode == 3) g_myRunMode = 1;		// if running, pause
-									    else g_myRunMode = 3;		// if paused, run.
-			break;
-		case ' ':			// space-bar: single-step
-			g_myRunMode = 2;
-			break;
-		default:
-			console.log('myKeyPress(): Ignored key: '+myChar);
-			break;
-	}
-}
-
-function displayMe() {
-//==============================================================================
-// Print current state of the particle system on the webpage:
-	var recipTime = 1000.0 / g_timeStep;			// to report fractional seconds
-	var recipMin  = 1000.0 / g_timeStepMin;
-	var recipMax  = 1000.0 / g_timeStepMax; 
-	var solvType;												// convert solver number to text:
-	if(g_solver==0) solvType = 'Explicit--(unstable!)<br>';
-	else 						solvType = 'Implicit--(stable)<br>'; 
-	var bounceType;											// convert bounce number to text
-	if(g_bounce==0) bounceType = 'Velocity Reverse(no rest)<br>';
-	else 						bounceType = 'Impulsive (will rest)<br>';
-	var xvLimit = xvelNow;							// find absolute values of xvelNow
-	if(xvelNow < 0.0) xvLimit = -xvelNow;
-	var yvLimit = yvelNow;							// find absolute values of yvelNow
-	if(yvelNow < 0.0) yvLimit = -yvelNow;
-	
-	document.getElementById('KeyResult').innerHTML = 
-   			'<b>Solver = </b>' + solvType + 
-   			'<b>Bounce = </b>' + bounceType +
-   			'<b>drag = </b>' + g_drag.toFixed(5) + 
-   			', <b>grav = </b>' + g_grav.toFixed(5) +
-   			' m/s^2; <b>yVel = +/-</b> ' + yvLimit.toFixed(5) + 
-   			' m/s; <b>xVel = +/-</b> ' + xvLimit.toFixed(5) + 
-   			' m/s;<br><b>timeStep = </b> 1/' + recipTime.toFixed(3) + ' sec' +
-   			                ' <b>min:</b> 1/' + recipMin.toFixed(3)  + ' sec' + 
-   			                ' <b>max:</b> 1/' + recipMax.toFixed(3)  + ' sec<br>' +
-   			'';//' <b>s1Array: </b>' + partVec.s1 ;
-
-    // console.log(partVec.s1);
-
-}
-
-function printBall() {
-//==============================================================================
-// Print current and previous position and velocity on console.
-// Do you see why formally-defined states s0 and s1 are so helpful?
-// It's far too easy to confuse 'current' and 'previous' values!
-
-}
-
-
-function onPlusButton() {
-//==============================================================================
-	INIT_VEL *= 1.2;		// increase
-	console.log('Initial velocity: '+INIT_VEL);
-}
-
-function onMinusButton() {
-//==============================================================================
-	INIT_VEL /= 1.2;		// shrink
-	console.log('Initial velocity: '+INIT_VEL);
 }
