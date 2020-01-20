@@ -25,7 +25,7 @@ Gravity.prototype.constructor = Gravity;
 Gravity.prototype.applyForce = function(p) {
 
 	var j = 0;
-	var zInc = 2;
+	var zInc = 1; //y Axis
 
 	for (var i = 0; i < p.partCount; i++, j+=PartObjectSize) {
 		p.s1[PartFLoc + zInc + j] -= this.g;
@@ -52,13 +52,15 @@ Drag.prototype.constructor = Drag;
 Drag.prototype.applyForce = function(p) {
 
 	var j = 0;
+	var curcoeff = this.revcoeff * 1000 / g_timeStep;
+	// console.log(g_timeStep, curcoeff);
 
 	for (var i = 0; i < p.partCount; i++, j+=PartObjectSize) {
 		for (var inc = 0; inc < PartDim; inc++) {
 			var tinc = j + inc;
 
-			// F = ma
-			p.s1[PartFLoc + tinc] -= p.s1[PartMLocSingle + j] * p.s1[PartVelLoc + tinc] * this.revcoeff;
+			// F = ma， F_g=cMV
+			p.s1[PartFLoc + tinc] -= p.s1[PartMLocSingle + j] * p.s1[PartVelLoc + tinc] * curcoeff;
 
 		}
 	}

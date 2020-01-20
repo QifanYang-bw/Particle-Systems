@@ -141,6 +141,7 @@ PartSys.prototype.dotFinder = function() {
 				this.s1dot[PartVelLoc + tinc] += this.s1dot[PartMLocSingle + j] * this.s1[PartVelLoc + tinc]
 			}
 
+
 		}
 	}
 
@@ -158,6 +159,29 @@ PartSys.prototype.solver = function() {
 
 		this.s2[i] = this.s1[i] + this.s1dot[i] * t;
 
+	}
+
+	var j = 0;
+
+	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+
+		this.s2[PartMLocSingle + j] = this.s1[PartMLocSingle + j] + this.s1dot[PartMLocSingle + j] * t;
+
+		for (var inc = 0; inc < PartDim; inc++) {
+			var tinc = j + inc;
+
+			// Position is calculated last after Velocity 
+
+			this.s2[PartVelLoc + tinc] = this.s1[PartVelLoc + tinc] + this.s1dot[PartVelLoc + tinc] * t;
+
+			// We don't need this for now:
+			// this.s2[PartFLoc + tinc] = this.s1[PartFLoc + tinc] + this.s1dot[PartFLoc + tinc] * t;
+
+			// The stable trick!
+
+			this.s2[PartPosLoc + tinc] = this.s1[PartPosLoc + tinc] + this.s2[PartVelLoc + tinc] * t;
+
+		}
 	}
 
 }
