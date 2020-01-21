@@ -248,9 +248,11 @@ function main() {
 
   // ============================= PartSys Init ===================================
 
-  partVec.init(1, forceList, limitList);
+  partVec.init(2, forceList, limitList);
   partVec.setPosition(0, 0, 0, 0);
+  partVec.setPosition(1, 0.5, 0.5, 0.5);
   partVec.setMass(0, 1);
+  partVec.setMass(1, 1);
 
   // ============================= Canvas Settings ===================================
 	
@@ -596,7 +598,7 @@ function draw(n) {
     
   partBox.switchToMe();
   partBox.adjust(vpMatrix);
-  partBox.draw();
+  partBox.draw(partVec);
 
   gridBox.switchToMe();
   gridBox.adjust(vpMatrix);

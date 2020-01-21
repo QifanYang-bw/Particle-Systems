@@ -155,11 +155,11 @@ PartSys.prototype.solver = function() {
 	// console.log(this.s1);
 	var t = g_timeStep * 0.001;
 
-	for (var i = 0; i < this.totalLength; i++) {
+	// for (var i = 0; i < this.totalLength; i++) {
 
-		this.s2[i] = this.s1[i] + this.s1dot[i] * t;
+	// 	this.s2[i] = this.s1[i] + this.s1dot[i] * t;
 
-	}
+	// }
 
 	var j = 0;
 

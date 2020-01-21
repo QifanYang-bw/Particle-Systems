@@ -252,10 +252,12 @@ VboParticles.prototype.adjust = function(vpMatrix) {
   gl.uniformMatrix4fv(u_MvpMatrixID, false, vpMatrix.elements);
 
   gl.uniform1i(u_runModeID, g_myRunMode); // run/step/pause the particle system
-  gl.uniform4f(u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
+
+  // Maybe I should assign the values here?
+  // gl.uniform4f(u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
 }
 
-VboParticles.prototype.draw = function() {
+VboParticles.prototype.draw = function(partVec) {
 //=============================================================================
 // Render current VBObox contents.
 
@@ -271,7 +273,29 @@ VboParticles.prototype.draw = function() {
   //               this.vboVerts); // draw this many vertices.
 
   // Draw our VBO's contents:
-  gl.drawArrays(gl.POINTS, 0, myVerts);
+
+
+  var j = 0;
+
+  for (var i = 0; i < partVec.partCount; i++, j+=PartObjectSize) {
+
+    var loc = PartPosLoc + j;
+
+    gl.uniform4f(u_ballShiftID,
+                 partVec.s1[loc + 0],
+                 partVec.s1[loc + 1],
+                 partVec.s1[loc + 2],
+                 0.0
+                ); 
+    gl.drawArrays(gl.POINTS, 0, 1);
+
+  }
+
+  // This wouldn't hold for long, but it works for now
+
+   // send to gfx system
+
+  // gl.uniform4f(u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
 }
 
 VboParticles.prototype.reload = function() {
