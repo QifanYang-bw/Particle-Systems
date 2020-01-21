@@ -80,35 +80,35 @@
 //
 //==============================================================================
 // Vertex shader program:
-var VSHADER_SOURCE =
-  'precision mediump float;\n' +				// req'd in OpenGL ES if we use 'float'
+// var VSHADER_SOURCE =
+//   'precision mediump float;\n' +				// req'd in OpenGL ES if we use 'float'
   
-  'uniform   int u_runMode; \n' +					// particle system state: 
-  																				// 0=reset; 1= pause; 2=step; 3=run
-  'uniform	 vec4 u_ballShift; \n' +			// single bouncy-ball's movement
+//   'uniform   int u_runMode; \n' +					// particle system state: 
+//   																				// 0=reset; 1= pause; 2=step; 3=run
+//   'uniform	 vec4 u_ballShift; \n' +			// single bouncy-ball's movement
 
-  'uniform   mat4 u_MvpMatrix; \n' +
-  'attribute vec4 a_Position;\n' +
+//   'uniform   mat4 u_MvpMatrix; \n' +
+//   'attribute vec4 a_Position;\n' +
 
-  'varying   vec4 v_Color; \n' +
-  'void main() {\n' +
-  '  gl_PointSize = 20.0;\n' +            // TRY MAKING THIS LARGER...
-  '	 gl_Position = u_MvpMatrix * (a_Position + u_ballShift); \n' +	
+//   'varying   vec4 v_Color; \n' +
+//   'void main() {\n' +
+//   '  gl_PointSize = 20.0;\n' +            // TRY MAKING THIS LARGER...
+//   '	 gl_Position = u_MvpMatrix * (a_Position + u_ballShift); \n' +	
 
-	// Let u_runMode determine particle color:
-  '  if(u_runMode == 0) { \n' +
-	'	   v_Color = vec4(1.0, 0.0, 0.0, 1.0);	\n' +		// red: 0==reset
-	'  	 } \n' +
-	'  else if(u_runMode == 1) {  \n' +
-	'    v_Color = vec4(1.0, 1.0, 0.0, 1.0); \n' +	// yellow: 1==pause
-	'    }  \n' +
-	'  else if(u_runMode == 2) { \n' +    
-	'    v_Color = vec4(1.0, 1.0, 1.0, 1.0); \n' +	// white: 2==step
-  '    } \n' +
-	'  else { \n' +
-	'    v_Color = vec4(0.2, 1.0, 0.2, 1.0); \n' +	// green: >3==run
-	'		 } \n' +
-  '} \n';
+// 	// Let u_runMode determine particle color:
+//   '  if(u_runMode == 0) { \n' +
+// 	'	   v_Color = vec4(1.0, 0.0, 0.0, 1.0);	\n' +		// red: 0==reset
+// 	'  	 } \n' +
+// 	'  else if(u_runMode == 1) {  \n' +
+// 	'    v_Color = vec4(1.0, 1.0, 0.0, 1.0); \n' +	// yellow: 1==pause
+// 	'    }  \n' +
+// 	'  else if(u_runMode == 2) { \n' +    
+// 	'    v_Color = vec4(1.0, 1.0, 1.0, 1.0); \n' +	// white: 2==step
+//   '    } \n' +
+// 	'  else { \n' +
+// 	'    v_Color = vec4(0.2, 1.0, 0.2, 1.0); \n' +	// green: >3==run
+// 	'		 } \n' +
+//   '} \n';
 // Each instance computes all the on-screen attributes for just one VERTEX,
 // supplied by 'attribute vec4' variable a_Position, filled from the 
 // Vertex Buffer Object (VBO) we created inside the graphics hardware by calling 
@@ -116,17 +116,17 @@ var VSHADER_SOURCE =
 
 //==============================================================================
 // Fragment shader program:
-var FSHADER_SOURCE =
-  'precision mediump float;\n' +
-  'varying vec4 v_Color; \n' +
-  'void main() {\n' +
-  '  float dist = distance(gl_PointCoord, vec2(0.5, 0.5)); \n' +
-  '  if(dist < 0.5) { \n' +	
-	'  	 gl_FragColor = vec4((1.0-2.0*dist)*v_Color.rgb, 1.0); \n' +
-	'  } else { \n' +
-  '    discard; ' + 
-  '  }\n' +
-  '}\n';
+// var FSHADER_SOURCE =
+//   'precision mediump float;\n' +
+//   'varying vec4 v_Color; \n' +
+//   'void main() {\n' +
+//   '  float dist = distance(gl_PointCoord, vec2(0.5, 0.5)); \n' +
+//   '  if(dist < 0.5) { \n' +	
+// 	'  	 gl_FragColor = vec4((1.0-2.0*dist)*v_Color.rgb, 1.0); \n' +
+// 	'  } else { \n' +
+//   '    discard; ' + 
+//   '  }\n' +
+//   '}\n';
 // --Each instance computes all the on-screen attributes for just one PIXEL.
 // --Draw large POINTS primitives as ROUND instead of square.  HOW?
 //   See pg. 377 in  textbook: "WebGL Programming Guide".  The vertex shaders' 
@@ -184,7 +184,15 @@ var limitList = [new AxisWall('x', 0.0, '+'), new AxisWall('x', 1.8, '-'),
                  new AxisWall('y', 0.0, '+'), new AxisWall('y', 1.8, '-'),
                  new AxisWall('z', 0.0, '+'), new AxisWall('z', 1.8, '-')];
 
-var u_runModeID, u_ballShiftID, u_MvpMatrixID;
+//============================== WebGL Global Variables ===============================
+
+var vpMatrix;
+
+var a_PositionID, u_runModeID, u_ballShiftID, u_MvpMatrixID;
+
+var partBox, gridBox;
+
+var myVerts = 1;
 
 function main() {
 
@@ -229,38 +237,11 @@ function main() {
   //			single-number and single-letter inputs that include SHIFT,CTRL,ALT.
 	// END Mouse & Keyboard Event-Handlers-----------------------------------
 	
-  // Initialize shaders
-  if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
-    console.log('Failed to initialize shaders.');
-    return;
-  }
+  gridBox = new VboGrid();
+  partBox = new VboParticles();
 
-  // Write the positions of vertices into an array, transfer array contents to a 
-  // Vertex Buffer Object created in the graphics hardware.
-  var myVerts = initVertexBuffers(gl);
-  if (myVerts < 0) {
-    console.log('Failed to set the positions of the vertices');
-    return;
-  }
-  gl.clearColor(0, 0, 0, 1);	  // RGBA color for clearing WebGL framebuffer
-  gl.clear(gl.COLOR_BUFFER_BIT);		// clear it once to set that color as bkgnd.
-  
-  // Get graphics system storage location of uniforms our shaders use:
-  // (why? see  http://www.opengl.org/wiki/Uniform_(GLSL) )
-  u_runModeID = gl.getUniformLocation(gl.program, 'u_runMode');
-  if(!u_runModeID) {
-  	console.log('Failed to get u_runMode variable location');
-  	return;
-  }
-	gl.uniform1i(u_runModeID, g_myRunMode);		// keyboard callbacks set g_myRunMode
-
-	u_ballShiftID = gl.getUniformLocation(gl.program, 'u_ballShift');
-	if(!u_ballShiftID) {
-		console.log('Failed to get u_ballPos variable location');
-		return;
-	}
-
-  u_MvpMatrixID = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
+  gridBox.init();
+  partBox.init();
 
   // ============================= PartSys Init ===================================
 
@@ -268,8 +249,13 @@ function main() {
   partVec.setPosition(0, 0, 0, 0);
   partVec.setMass(0, 1);
 
-  // ==============================================================================
+  // ============================= Canvas Settings ===================================
 	
+  gl.clearColor(0, 0, 0, 1);    // RGBA color for clearing WebGL framebuffer
+  // gl.clear(gl.COLOR_BUFFER_BIT);    // clear it once to set that color as bkgnd.
+  
+  gl.enable(gl.DEPTH_TEST);
+
 	// Display (initial) particle system values on webpage
 	// displayMe();
 
@@ -583,81 +569,29 @@ function draw(n) {
 
   // ========================= Set Up Perspective Camera =========================
   gl.viewport(0,0,g_canvas.width, g_canvas.height);
-  var mMatrix = new Matrix4();
+  vpMatrix = new Matrix4();
   
   // FOV = 30 deg
-  mMatrix.perspective(30.0,   // FOVY: top-to-bottom vertical image angle, in degrees
+  vpMatrix.perspective(30.0,   // FOVY: top-to-bottom vertical image angle, in degrees
                       (g_canvas.width)/g_canvas.height,   // Image Aspect Ratio: camera lens width/height
                       1.0,   // camera z-near distance (always positive; frustum begins at z = -znear)
                       1000.0);  // camera z-far distance (always positive; frustum ends at z = -zfar)
   
-  mMatrix.lookAt(eyeX,  eyeY,  eyeZ,     // center of projection
+  vpMatrix.lookAt(eyeX,  eyeY,  eyeZ,     // center of projection
                  lookAtX, lookAtY, lookAtZ,  // look-at point 
                  0,  0,  1);
  
     
-  gl.uniformMatrix4fv(u_MvpMatrixID, false, mMatrix.elements);
+  partBox.switchToMe();
+  partBox.adjust(vpMatrix);
+  partBox.draw();
 
-  gl.uniform1i(u_runModeID, g_myRunMode); // run/step/pause the particle system
-  gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);  // send to gfx system
-  
-  // Draw our VBO's contents:
-  gl.drawArrays(gl.POINTS, 0, n);
+  gridBox.switchToMe();
+  gridBox.adjust(vpMatrix);
+  gridBox.draw();
   
   // Report mouse-drag totals.
 	document.getElementById('MouseResult0').innerHTML=
 			'Mouse Drag totals (CVV coords):\t'+xMdragTot+', \t'+yMdragTot;	
 }
 
-function initVertexBuffers() {
-//==============================================================================
-// Set up all buffer objects on our graphics hardware.
-  var vertices = new Float32Array ([			// JUST ONE particle:
- //    0.0,  0.5, 0.0, 1.0,   				// x,y,z,w position
-      -0.9, -0.9, 0.0, 1.0,   
- //    0.5, -0.5, 0.0, 1.0,
-  ]);
-  var vcount = 1;   // The number of vertices
-  FSIZE = vertices.BYTES_PER_ELEMENT; // # bytes per floating-point value (global!)
-
-  // Create a buffer object in the graphics hardware: get its ID# 
-  var vertexBufferID = gl.createBuffer();
-  if (!vertexBufferID) {
-    console.log('Failed to create the buffer object');
-    return -1;
-  }
-  // "Bind the new buffer object (memory in the graphics system) to target"
-  // In other words, specify the usage of one selected buffer object.
-  // What's a "Target"? it's the poorly-chosen OpenGL/WebGL name for the 
-  // intended use of this buffer's memory; so far, we have just two choices:
-  //	== "gl.ARRAY_BUFFER" meaning the buffer object holds actual values we need 
-  //			for rendering (positions, colors, normals, etc), or 
-  //	== "gl.ELEMENT_ARRAY_BUFFER" meaning the buffer object holds indices 
-  // 			into a list of values we need; indices such as object #s, face #s, 
-  //			edge vertex #s.
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferID);
-
- // Write data from our JavaScript array to graphics systems' buffer object:
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-  // Get the ID# for the a_Position variable in the graphics hardware
-  var a_PositionID = gl.getAttribLocation(gl.program, 'a_Position');
-  if(a_PositionID < 0) {
-    console.log('Failed to get the storage location of a_Position');
-    return -1;
-  }
-  // Tell GLSL to fill the 'a_Position' attribute variable for each shader 
-  // with values from the buffer object chosen by 'gl.bindBuffer()' command.
-	// websearch yields OpenGL version: 
-	//		http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribPointer.xml
-  gl.vertexAttribPointer(a_PositionID, 
-                          4,  // # of values in this attrib (1,2,3,4) 
-                          gl.FLOAT, // data type (usually gl.FLOAT)
-                          false,    // use integer normalizing? (usually false)
-                          4*FSIZE,  // Stride: #bytes from 1st stored value to next 
-                          0*FSIZE); // Offset; #bytes from start of buffer to 
-                                    // 1st stored attrib value we will actually use.
-  // Enable this assignment of the bound buffer to the a_Position variable:
-  gl.enableVertexAttribArray(a_PositionID);
-  return vcount;
-}

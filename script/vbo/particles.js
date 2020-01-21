@@ -85,16 +85,6 @@ function VboParticles() {
 
 
   //=============================================================================
-  // Initialize shaders
-  if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
-    console.log('Failed to initialize shaders.');
-    return;
-  }
-
-  
-
-  //=============================================================================
-
 
   	            //-----------------------GPU memory locations:
   	this.vboLoc;									// GPU Location for Vertex Buffer Object, 
@@ -102,8 +92,8 @@ function VboParticles() {
   	this.shaderLoc;								// GPU Location for compiled Shader-program  
   	                            	// set by compile/link of VERT_SRC and FRAG_SRC.
   								          //------Attribute locations in our shaders:
-  	this.a_PosLoc;								// GPU location for 'a_Pos0' attribute
-  	this.a_ColrLoc;								// GPU location for 'a_Colr0' attribute
+  	// this.a_PosLoc;								// GPU location for 'a_Pos0' attribute
+  	// this.a_ColrLoc;								// GPU location for 'a_Colr0' attribute
 
   	            //---------------------- Uniform locations &values in our shaders
   	this.ModelMat = new Matrix4();	// Transforms CVV axes to model axes.
@@ -137,8 +127,8 @@ VboParticles.prototype.init = function() {
   FSIZE = vertices.BYTES_PER_ELEMENT; // # bytes per floating-point value (global!)
 
   // Create a buffer object in the graphics hardware: get its ID# 
-  var vertexBufferID = gl.createBuffer();
-  if (!vertexBufferID) {
+  this.vboLoc = gl.createBuffer();
+  if (!this.vboLoc) {
     console.log('Failed to create the buffer object');
     return -1;
   }
@@ -151,7 +141,7 @@ VboParticles.prototype.init = function() {
   //  == "gl.ELEMENT_ARRAY_BUFFER" meaning the buffer object holds indices 
   //      into a list of values we need; indices such as object #s, face #s, 
   //      edge vertex #s.
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferID);
+  gl.bindBuffer(gl.ARRAY_BUFFER, this.vboLoc);
 
  // Write data from our JavaScript array to graphics systems' buffer object:
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
@@ -196,7 +186,7 @@ VboParticles.prototype.switchToMe = function() {
  //  //  instead connect to our own already-created-&-filled VBO.  This new VBO can 
  //  //    supply values to use as attributes in our newly-selected shader program:
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferID);
+  gl.bindBuffer(gl.ARRAY_BUFFER, this.vboLoc);
 
   //  // c) connect our newly-bound VBO to supply attribute variable values for each
   //  // vertex to our SIMD shader program, using 'vertexAttribPointer()' function.
@@ -257,8 +247,9 @@ VboParticles.prototype.adjust = function(vpMatrix) {
   // 										false, 				// use matrix transpose instead?
   // 										this.ModelMat.elements);	// send data from Javascript.
 
+  // console.log(vpMatrix);
 
-  gl.uniformMatrix4fv(u_MvpMatrixID, false, mMatrix.elements);
+  gl.uniformMatrix4fv(u_MvpMatrixID, false, vpMatrix.elements);
 
   gl.uniform1i(u_runModeID, g_myRunMode); // run/step/pause the particle system
   gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);  // send to gfx system
@@ -280,7 +271,7 @@ VboParticles.prototype.draw = function() {
   //               this.vboVerts); // draw this many vertices.
 
   // Draw our VBO's contents:
-  gl.drawArrays(gl.POINTS, 0, n);
+  gl.drawArrays(gl.POINTS, 0, myVerts);
 }
 
 VboParticles.prototype.reload = function() {

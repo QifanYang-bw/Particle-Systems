@@ -1,71 +1,3 @@
-var gndVerts, gndVertsCount = 0;
-
-function makeGroundGrid() {
-
-  var floatsPerPosition = 4;
-
-  var floatsPerVertex = 8;  // # of Float32Array elements used for each vertex
-  //==============================================================================
-  // Create a list of vertices that create a large grid of lines in the x,y plane
-  // centered at the origin.  Draw this shape using the GL_LINES primitive.
-
-  if (gndVertsCount > 0) return;
-
-  var xcount = 100;     // # of lines to draw in x,y to make the grid.
-  var ycount = 100;   
-  var xymax = 50.0;     // grid size; extends to cover +/-xymax in x and y.
-  var xColr = new Float32Array([1.0, 1.0, 0.3, 1.0]);  // bright yellow
-  var yColr = new Float32Array([0.5, 1.0, 0.5, 1.0]);  // bright green.
-  
-  gndVertsCount = 2*(xcount+ycount);
-  // Create an (global) array to hold this ground-plane's vertices:
-  gndVerts = new Float32Array(floatsPerVertex*gndVertsCount);
-            // draw a grid made of xcount+ycount lines; 2 vertices per line.
-            
-  var xgap = xymax/(xcount-1);    // HALF-spacing between lines in x,y;
-  var ygap = xymax/(ycount-1);    // (why half? because v==(0line number/2))
-  
-  // First, step thru x values as we make vertical lines of constant-x:
-  for(v=0, j=0; v<2*xcount; v++, j+= floatsPerVertex) {
-    if(v%2==0) {  // put even-numbered vertices at (xnow, -xymax, 0)
-      gndVerts[j  ] = -xymax + (v  )*xgap;  // x
-      gndVerts[j+1] = -xymax;               // y
-      gndVerts[j+2] = 0.0;                  // z
-      gndVerts[j+3] = 1.0;                  // w.
-    }
-    else {        // put odd-numbered vertices at (xnow, +xymax, 0).
-      gndVerts[j  ] = -xymax + (v-1)*xgap;  // x
-      gndVerts[j+1] = xymax;                // y
-      gndVerts[j+2] = 0.0;                  // z
-      gndVerts[j+3] = 1.0;                  // w.
-    }
-    gndVerts[j+4] = xColr[0];     // red
-    gndVerts[j+5] = xColr[1];     // grn
-    gndVerts[j+6] = xColr[2];     // blu
-    gndVerts[j+7] = xColr[3];     // blu
-  }
-  // Second, step thru y values as wqe make horizontal lines of constant-y:
-  // (don't re-initialize j--we're adding more vertices to the array)
-  for(v=0; v<2*ycount; v++, j+= floatsPerVertex) {
-    if(v%2==0) {    // put even-numbered vertices at (-xymax, ynow, 0)
-      gndVerts[j  ] = -xymax;               // x
-      gndVerts[j+1] = -xymax + (v  )*ygap;  // y
-      gndVerts[j+2] = 0.0;                  // z
-      gndVerts[j+3] = 1.0;                  // w.
-    }
-    else {          // put odd-numbered vertices at (+xymax, ynow, 0).
-      gndVerts[j  ] = xymax;                // x
-      gndVerts[j+1] = -xymax + (v-1)*ygap;  // y
-      gndVerts[j+2] = 0.0;                  // z
-      gndVerts[j+3] = 1.0;                  // w.
-    }
-    gndVerts[j+4] = yColr[0];     // red
-    gndVerts[j+5] = yColr[1];     // grn
-    gndVerts[j+6] = yColr[2];     // blu
-    gndVerts[j+7] = yColr[3];     // blu
-  }
-}
-
 //=============================================================================
 //=============================================================================
 function VboGrid() {
@@ -169,12 +101,12 @@ VboGrid.prototype.init = function() {
   //  you must call this VBObox object's switchToMe() function too!
   //--------------------
   // a) Compile,link,upload shaders-----------------------------------------------
-  	this.shaderLoc = createProgram(gl, this.VERT_SRC, this.FRAG_SRC);
-  	if (!this.shaderLoc) {
-      console.log(this.constructor.name + 
-      						'.init() failed to create executable Shaders on the GPU. Bye!');
-      return;
-    }
+	this.shaderLoc = createProgram(gl, this.VERT_SRC, this.FRAG_SRC);
+	if (!this.shaderLoc) {
+    console.log(this.constructor.name + 
+    						'.init() failed to create executable Shaders on the GPU. Bye!');
+    return;
+  }
   // CUTE TRICK: let's print the NAME of this VBObox object: tells us which one!
   //  else{console.log('You called: '+ this.constructor.name + '.init() fcn!');}
 
@@ -395,3 +327,71 @@ VboGrid.prototype.restore = function() {
 //
 }
 */
+
+var gndVerts, gndVertsCount = 0;
+
+function makeGroundGrid() {
+
+  var floatsPerPosition = 4;
+
+  var floatsPerVertex = 8;  // # of Float32Array elements used for each vertex
+  //==============================================================================
+  // Create a list of vertices that create a large grid of lines in the x,y plane
+  // centered at the origin.  Draw this shape using the GL_LINES primitive.
+
+  if (gndVertsCount > 0) return;
+
+  var xcount = 100;     // # of lines to draw in x,y to make the grid.
+  var ycount = 100;   
+  var xymax = 50.0;     // grid size; extends to cover +/-xymax in x and y.
+  var xColr = new Float32Array([1.0, 1.0, 0.3, 1.0]);  // bright yellow
+  var yColr = new Float32Array([0.5, 1.0, 0.5, 1.0]);  // bright green.
+  
+  gndVertsCount = 2*(xcount+ycount);
+  // Create an (global) array to hold this ground-plane's vertices:
+  gndVerts = new Float32Array(floatsPerVertex*gndVertsCount);
+            // draw a grid made of xcount+ycount lines; 2 vertices per line.
+            
+  var xgap = xymax/(xcount-1);    // HALF-spacing between lines in x,y;
+  var ygap = xymax/(ycount-1);    // (why half? because v==(0line number/2))
+  
+  // First, step thru x values as we make vertical lines of constant-x:
+  for(v=0, j=0; v<2*xcount; v++, j+= floatsPerVertex) {
+    if(v%2==0) {  // put even-numbered vertices at (xnow, -xymax, 0)
+      gndVerts[j  ] = -xymax + (v  )*xgap;  // x
+      gndVerts[j+1] = -xymax;               // y
+      gndVerts[j+2] = 0.0;                  // z
+      gndVerts[j+3] = 1.0;                  // w.
+    }
+    else {        // put odd-numbered vertices at (xnow, +xymax, 0).
+      gndVerts[j  ] = -xymax + (v-1)*xgap;  // x
+      gndVerts[j+1] = xymax;                // y
+      gndVerts[j+2] = 0.0;                  // z
+      gndVerts[j+3] = 1.0;                  // w.
+    }
+    gndVerts[j+4] = xColr[0];     // red
+    gndVerts[j+5] = xColr[1];     // grn
+    gndVerts[j+6] = xColr[2];     // blu
+    gndVerts[j+7] = xColr[3];     // blu
+  }
+  // Second, step thru y values as wqe make horizontal lines of constant-y:
+  // (don't re-initialize j--we're adding more vertices to the array)
+  for(v=0; v<2*ycount; v++, j+= floatsPerVertex) {
+    if(v%2==0) {    // put even-numbered vertices at (-xymax, ynow, 0)
+      gndVerts[j  ] = -xymax;               // x
+      gndVerts[j+1] = -xymax + (v  )*ygap;  // y
+      gndVerts[j+2] = 0.0;                  // z
+      gndVerts[j+3] = 1.0;                  // w.
+    }
+    else {          // put odd-numbered vertices at (+xymax, ynow, 0).
+      gndVerts[j  ] = xymax;                // x
+      gndVerts[j+1] = -xymax + (v-1)*ygap;  // y
+      gndVerts[j+2] = 0.0;                  // z
+      gndVerts[j+3] = 1.0;                  // w.
+    }
+    gndVerts[j+4] = yColr[0];     // red
+    gndVerts[j+5] = yColr[1];     // grn
+    gndVerts[j+6] = yColr[2];     // blu
+    gndVerts[j+7] = yColr[3];     // blu
+  }
+}
