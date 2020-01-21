@@ -164,44 +164,7 @@ var g_stepCount = 0;						// Advances by 1 for each timestep, modulo 1000,
 																// (0,1,2,3,...997,998,999,0,1,2,..) to identify 
 																// WHEN the ball bounces.  RESET by 'r' or 'R'.
 
-// Define all the adjustable ball-movement parameters, and
-var INIT_VEL =  0.15 * 60.0;		// initial velocity in meters/sec.
-												// adjust by ++Start, --Start buttons. Original value 
-												// was 0.15 meters per timestep; multiply by 60 to get
-												// meters per second.
-												// timesteps per second.
-var g_drag = 0.985;			// units-free air-drag (scales velocity); adjust by d/D keys
-var g_grav = 9.832;			// gravity's acceleration; adjust by g/G keys
-												// on Earth surface: 9.832 meters/sec^2.
-var g_resti = 1.0;			// units-free 'Coefficient of restitution' for 
-												// inelastic collisions.  Sets the fraction of momentum 
-												// (0.0 <= g_resti < 1.0) that remains after a ball 
-												// 'bounces' on a wall or floor, as computed using 
-												// velocity perpendicular to the surface. 
-												// (Recall: momentum==mass*velocity.  If ball mass does 
-												// not change, and the ball bounces off the x==0 wall,
-												// its x velocity xvel will change to -xvel*g_resti ).
-var g_solver = 1;				// adjust by s/S keys.
-												// ==0 for Euler solver (explicit, forward-time, as 
-												// found in BouncyBall03 and BouncyBall04.goodMKS)
-												// ==1 for special-case implicit solver, reverse-time, 
-												// as found in BouncyBall03.01BAD, BouncyBall04.01badMKS)
-var g_bounce = 1;				// floor-bounce constraint type:
-												// ==0 for velocity-reversal, as in all previous versions
-												// ==1 for Chapter 3's collision resolution method, which
-												// uses an 'impulse' to cancel any velocity boost caused
-												// by falling below the floor.
-												
-// Define just one 'bouncy ball' particle
-var xposNow = 0.0;			var yposNow = 0.0;		var zposNow =  0.0;		
-var xvelNow = 0.0;			var yvelNow = 0.0;		var zvelNow =  0.0;
-
-// Tricky extra variables we need for our new way of resolving collisions.
-// When we're executing our 'constraint' code, these new vars hold 's0' state 
-// values, and the 'Now' vars above hold the 's1' state values. CONFUSING!!
-// Thus we found another good reason to convert to 'state-variable' form...
-var xposPrev = 0.0;			var yposPrev = 0.0;		
-var yposPrev = 0.0;			var yvelPrev = 0.0;
+//=============================================================================
 
 // For keyboard, mouse-click-and-drag:		
 var g_myRunMode = 3;	// particle system state: 0=reset; 1= pause; 2=step; 3=run
@@ -221,7 +184,7 @@ var limitList = [new AxisWall('x', 0.0, '+'), new AxisWall('x', 1.8, '-'),
                  new AxisWall('y', 0.0, '+'), new AxisWall('y', 1.8, '-'),
                  new AxisWall('z', 0.0, '+'), new AxisWall('z', 1.8, '-')];
 
-var u_MvpMatrixID = false;
+var u_runModeID, u_ballShiftID, u_MvpMatrixID;
 
 function main() {
 
@@ -297,6 +260,8 @@ function main() {
 		return;
 	}
 
+  u_MvpMatrixID = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
+
   // ============================= PartSys Init ===================================
 
   partVec.init(1, forceList, limitList);
@@ -304,12 +269,9 @@ function main() {
   partVec.setMass(0, 1);
 
   // ==============================================================================
-
-	// gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);	// send to gfx system
-  u_MvpMatrixID = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
 	
 	// Display (initial) particle system values on webpage
-	displayMe();
+	// displayMe();
 
 	
   // Quick tutorial on synchronous, real-time animation in JavaScript/HTML-5: 
@@ -632,12 +594,13 @@ function draw(n) {
   mMatrix.lookAt(eyeX,  eyeY,  eyeZ,     // center of projection
                  lookAtX, lookAtY, lookAtZ,  // look-at point 
                  0,  0,  1);
-
+ 
+    
   gl.uniformMatrix4fv(u_MvpMatrixID, false, mMatrix.elements);
 
-	gl.uniform1i(u_runModeID, g_myRunMode);	// run/step/pause the particle system
-	gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);	// send to gfx system
-    
+  gl.uniform1i(u_runModeID, g_myRunMode); // run/step/pause the particle system
+  gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);  // send to gfx system
+  
   // Draw our VBO's contents:
   gl.drawArrays(gl.POINTS, 0, n);
   
