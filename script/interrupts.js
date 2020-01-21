@@ -241,7 +241,7 @@ function myKeyPress(kev) {
 			// if(xvelNow > 0.0) xvelNow += INIT_VEL; else xvelNow -= INIT_VEL;
 			// if(yvelNow > 0.0) yvelNow += 0.9*INIT_VEL; else yvelNow -= 0.9*INIT_VEL;
 
-      		partVec.addVelocityToAll(INIT_VEL, 0.9*INIT_VEL, 0);
+      		partVec.addVelocityToAll(INIT_VEL, 0.9*INIT_VEL, 0.8*INIT_VEL);
 			break;	
 		// case 's':
 		// case 'S':
@@ -455,14 +455,17 @@ function displayMe() {
 	if(xvelNow < 0.0) xvLimit = -xvelNow;
 	var yvLimit = yvelNow;							// find absolute values of yvelNow
 	if(yvelNow < 0.0) yvLimit = -yvelNow;
+	var zvLimit = zvelNow;							// find absolute values of yvelNow
+	if(zvelNow < 0.0) zvLimit = -zvelNow;
 	
 	document.getElementById('KeyResult').innerHTML = 
    			'<b>Solver = </b>' + solvType + 
    			'<b>Bounce = </b>' + bounceType +
    			'<b>drag = </b>' + g_drag.toFixed(5) + 
    			', <b>grav = </b>' + g_grav.toFixed(5) +
-   			' m/s^2; <b>yVel = +/-</b> ' + yvLimit.toFixed(5) + 
-   			' m/s; <b>xVel = +/-</b> ' + xvLimit.toFixed(5) + 
+   			' m/s^2; <b>xVel = +/-</b> ' + xvLimit.toFixed(5) + 
+   			' m/s; <b>yVel = +/-</b> ' + yvLimit.toFixed(5) + 
+   			' m/s; <b>zVel = +/-</b> ' + zvLimit.toFixed(5) + 
    			' m/s;<br><b>timeStep = </b> 1/' + recipTime.toFixed(3) + ' sec' +
    			                ' <b>min:</b> 1/' + recipMin.toFixed(3)  + ' sec' + 
    			                ' <b>max:</b> 1/' + recipMax.toFixed(3)  + ' sec<br>' +

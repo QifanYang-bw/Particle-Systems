@@ -2,7 +2,89 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>BouncyBall06.SolveFloors</title>
+    <title>Activity Week 2 - 3D Bouncy Ball</title>
+    <style>
+      body {
+        background: #191919;
+        margin: 0 0;
+
+        color: #f3f3f3;
+      }
+      #webgl {
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .mainLocal{
+        width: 80%;
+        margin: 0 auto;
+        margin-top: 50px;
+
+        color: #d4d4d3;
+      }
+
+      .framework{
+        border: 20px solid #947278;
+        background: #f0f0f0;
+
+        font-size: 16px;
+        padding: 20px;
+        max-width:900px;
+        width: 100%;
+        margin: 0px auto;
+      }
+      .textTitle{
+        overflow: hidden;
+        margin: 0 0 20px 0;
+      }
+      .textTitle, h3{
+        color: #f0f0f0;
+      }
+      .spacebetween{
+        display: flex;
+        justify-content: space-between;
+      }
+      .author{
+        text-align: right;
+      }
+      .width33{
+        width:33%;
+      }
+      .stdHeight{
+        height: 5em;
+      }
+      .canvas{
+        border: 5px solid #bdc3c7;
+
+        /*margin: 20px 20px; */
+      }
+
+      /* for dat.gui */
+      .save-row{
+        background-color: #191919!important;
+      }
+
+      .button{
+        background-color: #787878!important;
+      }/*
+      .dg.main{
+        margin-right: 0px!important;
+      }*/
+/*      .button {
+        color: #614E51;
+        font-size : 15px;
+        text-decoration: none;
+        background: #e0e0e0;
+        padding: 10px;
+        border: 4px solid #614E51 ;
+        display: inline-block;
+        transition: all 0.4s ease 0s;
+      }
+
+      .button:active {
+        border: 4px solid #ccbcbe;
+      }*/
+    </style>
   </head>
 	<!--	Create the HTML5 'canvas' element in which we will run WebGL
 	-->
@@ -10,34 +92,46 @@
     <canvas id="webgl" width="600" height="600">
     	Please use a browser that supports "canvas"
     </canvas> 
-	<br> 
-	<b>Particle System Controls:</b> 
-  <br>
-  <b>r/R key:</b> refresh/Reset. 
-  <b>Space-bar:</b> single-step.    
-  <b>p or P key:</b> pause/resume.	
-	<br>
-  <b>c or C key:</b> toggle clear-screen.  
-	<b>d/D key:</b> less/more drag.  
-  <b>g/G key:</b> less/more gravity <br>
-  <b>s or S: switch solvers</b> (implicit vs. explicit) 
-  <br>
-  <b>b or B:</b> floor-bounce method
-	<!-- Make 'div' elements to hold changeable HTML made in our JavaScript file;
-		 (where? look at the end of 'BouncyBall03.js' at 
-			myKeyPress(), myKeyDown() and myKeyUp() fcns)
-	-->
-	<p>
-		<div id='KeyResult'> try it... </div>
-		<div id='MouseResult0'> Then look here... </div> 
-		<div id='MouseResult1'> And look here too... </div>
-  </p>
-	<p>
-      <button type="button" onclick="onPlusButton()" >++Start</button>
-      <button type="button" onclick="onMinusButton()">--Start</button>
-		Buttons adjust 'r' or 'R' key strength <br>
-		Open Console, please (right-click-->'Inspect Element'-->'Console' tab) 		
-	</p>
+
+    <div class="mainLocal">
+
+      <div class="textTitle spacebetween">
+        <div><h2>Activity Week 2 - 3D Bouncy Ball</h2></div>
+        <div class="author">
+          Qifan Yang: QYL123
+        </div>
+      </div>
+      
+    	<br> 
+    	<b>Particle System Controls:</b> 
+      <br>
+      <b>r/R key:</b> refresh/Reset. 
+      <b>Space-bar:</b> single-step.    
+      <b>p or P key:</b> pause/resume.	
+    	<br>
+      <b>c or C key:</b> toggle clear-screen.  
+    	<b>d/D key:</b> less/more drag.  
+      <b>g/G key:</b> less/more gravity <br>
+      <b>s or S: switch solvers</b> (implicit vs. explicit) 
+      <br>
+      <b>b or B:</b> floor-bounce method
+    	<!-- Make 'div' elements to hold changeable HTML made in our JavaScript file;
+    		 (where? look at the end of 'BouncyBall03.js' at 
+    			myKeyPress(), myKeyDown() and myKeyUp() fcns)
+    	-->
+    	<p>
+    		<div id='KeyResult'> try it... </div>
+    		<div id='MouseResult0'> Then look here... </div> 
+    		<div id='MouseResult1'> And look here too... </div>
+      </p>
+    	<p>
+          <button type="button" onclick="onPlusButton()" >++Start</button>
+          <button type="button" onclick="onMinusButton()">--Start</button>
+    		Buttons adjust 'r' or 'R' key strength <br>
+    		Open Console, please (right-click-->'Inspect Element'-->'Console' tab) 		
+    	</p>
+    </div>
+
 	<!--	Load in the JavaScript libraries supplied by our textbook 
 			(Matsuda et al., 2013 WebGL Programming Guide) that help us
 			with WebGL programming:

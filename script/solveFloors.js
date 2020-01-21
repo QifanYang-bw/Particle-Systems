@@ -186,6 +186,9 @@ var limitList = [new AxisWall('x', 0.0, '+'), new AxisWall('x', 1.8, '-'),
 
 //============================== WebGL Global Variables ===============================
 
+// Temperal Solution; Need changing
+var xposNow, yposNow, zposNow;
+
 var vpMatrix;
 
 var a_PositionID, u_runModeID, u_ballShiftID, u_MvpMatrixID;
@@ -251,9 +254,9 @@ function main() {
 
   // ============================= Canvas Settings ===================================
 	
-  gl.clearColor(0, 0, 0, 1);    // RGBA color for clearing WebGL framebuffer
+  gl.clearColor(0.08, 0.08, 0.07, 1);    // RGBA color for clearing WebGL framebuffer
   // gl.clear(gl.COLOR_BUFFER_BIT);    // clear it once to set that color as bkgnd.
-  
+
   gl.enable(gl.DEPTH_TEST);
 
 	// Display (initial) particle system values on webpage
@@ -277,6 +280,8 @@ function main() {
   var tick = function() {
     g_timeStep = animate(); 
                       // find out how much time passed since last screen redraw.
+
+    drawResize();
   	draw(myVerts);    // compute new particle state at current time
     requestAnimationFrame(tick, g_canvas);
                       // Call us again 'at next opportunity' as seen by the
@@ -548,19 +553,26 @@ function draw(n) {
 
   // console.log(partVec.s1);
 
-  partVec.applyForces();
+  if(   g_myRunMode > 1) {                // 0=reset; 1= pause; 2=step; 3=run
 
-  partVec.dotFinder();
-  partVec.solver();
-  partVec.doConstraint();
-  partVec.render();
-  partVec.swap();
+    if (g_myRunMode == 2) g_myRunMode = 1;     // (if 2, do just one step and pause.)
+
+    partVec.applyForces();
+    partVec.dotFinder();
+    partVec.solver();
+    partVec.doConstraint();
+    partVec.render();
+    partVec.swap();
+
+  }
     
 
   xposNow = partVec.s1[0];
   yposNow = partVec.s1[1];
+  zposNow = partVec.s1[2];
   xvelNow = partVec.s1[3];
   yvelNow = partVec.s1[4];
+  zvelNow = partVec.s1[5];
 
   displayMe();        // Display particle-system status on-screen.
 
@@ -595,3 +607,17 @@ function draw(n) {
 			'Mouse Drag totals (CVV coords):\t'+xMdragTot+', \t'+yMdragTot;	
 }
 
+
+function drawResize() {
+//==============================================================================
+// Called when user re-sizes their browser window , because our HTML file
+// contains:  <body onload="main()" onresize="winResize()">
+
+ // var nuCanvas = document.getElementById('webgl');  // get current canvas
+ // var nuGL = getWebGLContext(nuCanvas);             // and context:
+  
+  // g_canvas.width = window.innerWidth;
+  g_canvas.width = document.body.clientWidth;
+  g_canvas.height = Math.max(window.innerHeight * 0.6, window.innerHeight - 300);
+  // console.log(window.innerWidth, window.innerWidth - 12);
+}

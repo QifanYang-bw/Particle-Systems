@@ -341,8 +341,8 @@ function makeGroundGrid() {
 
   if (gndVertsCount > 0) return;
 
-  var xcount = 100;     // # of lines to draw in x,y to make the grid.
-  var ycount = 100;   
+  var xcount = 20;     // # of lines to draw in x,y to make the grid.
+  var ycount = 20;   
   var xymax = 50.0;     // grid size; extends to cover +/-xymax in x and y.
   var xColr = new Float32Array([1.0, 1.0, 0.3, 1.0]);  // bright yellow
   var yColr = new Float32Array([0.5, 1.0, 0.5, 1.0]);  // bright green.

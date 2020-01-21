@@ -25,7 +25,7 @@ Gravity.prototype.constructor = Gravity;
 Gravity.prototype.applyForce = function(p) {
 
 	var j = 0;
-	var zInc = 1; //y Axis
+	var zInc = 2; //y Axis
 
 	for (var i = 0; i < p.partCount; i++, j+=PartObjectSize) {
 		p.s1[PartFLoc + zInc + j] -= this.g;

@@ -252,7 +252,7 @@ VboParticles.prototype.adjust = function(vpMatrix) {
   gl.uniformMatrix4fv(u_MvpMatrixID, false, vpMatrix.elements);
 
   gl.uniform1i(u_runModeID, g_myRunMode); // run/step/pause the particle system
-  gl.uniform4f(u_ballShiftID, xposNow, yposNow, 0.0, 0.0);  // send to gfx system
+  gl.uniform4f(u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
 }
 
 VboParticles.prototype.draw = function() {
