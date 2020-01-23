@@ -147,28 +147,28 @@ VboParticles.prototype.init = function() {
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
   // Get the ID# for the a_Position variable in the graphics hardware
-  var a_PositionID = gl.getAttribLocation(gl.program, 'a_Position');
-  if(a_PositionID < 0) {
+  this.a_PositionID = gl.getAttribLocation(gl.program, 'a_Position');
+  if(this.a_PositionID < 0) {
     console.log('Failed to get the storage location of a_Position');
     return -1;
   }
 
   // Get graphics system storage location of uniforms our shaders use:
   // (why? see  http://www.opengl.org/wiki/Uniform_(GLSL) )
-  u_runModeID = gl.getUniformLocation(gl.program, 'u_runMode');
-  if(!u_runModeID) {
+  this.u_runModeID = gl.getUniformLocation(gl.program, 'u_runMode');
+  if(!this.u_runModeID) {
     console.log('Failed to get u_runMode variable location');
     return;
   }
 
-  u_ballShiftID = gl.getUniformLocation(gl.program, 'u_ballShift');
-  if(!u_ballShiftID) {
-    console.log('Failed to get u_ballPos variable location');
+  this.u_ballShiftID = gl.getUniformLocation(gl.program, 'u_ballShift');
+  if(!this.u_ballShiftID) {
+    console.log('Failed to get u_ballShftID variable location');
     return;
   }
 
-  u_MvpMatrixID = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
-  if(!u_MvpMatrixID) {
+  this.u_MvpMatrixID = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
+  if(!this.u_MvpMatrixID) {
     console.log('Failed to get u_MvpMatrixID variable location');
     return;
   }
@@ -194,7 +194,7 @@ VboParticles.prototype.switchToMe = function() {
   //    // 	Here's how to use the almost-identical OpenGL version of this function:
   //  	//		http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribPointer.xml )
 
-  gl.vertexAttribPointer(a_PositionID, 
+  gl.vertexAttribPointer(this.a_PositionID, 
                           4,  // # of values in this attrib (1,2,3,4) 
                           gl.FLOAT, // data type (usually gl.FLOAT)
                           false,    // use integer normalizing? (usually false)
@@ -202,7 +202,7 @@ VboParticles.prototype.switchToMe = function() {
                           0*FSIZE); // Offset; #bytes from start of buffer to 
                                     // 1st stored attrib value we will actually use.
   // Enable this assignment of the bound buffer to the a_Position variable:
-  gl.enableVertexAttribArray(a_PositionID);
+  gl.enableVertexAttribArray(this.a_PositionID);
 }
 
 VboParticles.prototype.isReady = function() {
@@ -249,12 +249,12 @@ VboParticles.prototype.adjust = function(vpMatrix) {
 
   // console.log(vpMatrix);
 
-  gl.uniformMatrix4fv(u_MvpMatrixID, false, vpMatrix.elements);
+  gl.uniformMatrix4fv(this.u_MvpMatrixID, false, vpMatrix.elements);
 
-  gl.uniform1i(u_runModeID, g_myRunMode); // run/step/pause the particle system
+  gl.uniform1i(this.u_runModeID, g_myRunMode); // run/step/pause the particle system
 
   // Maybe I should assign the values here?
-  // gl.uniform4f(u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
+  // gl.uniform4f(this.u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
 }
 
 VboParticles.prototype.draw = function(partVec) {
@@ -281,7 +281,7 @@ VboParticles.prototype.draw = function(partVec) {
 
     var loc = PartPosLoc + j;
 
-    gl.uniform4f(u_ballShiftID,
+    gl.uniform4f(this.u_ballShiftID,
                  partVec.s1[loc + 0],
                  partVec.s1[loc + 1],
                  partVec.s1[loc + 2],
@@ -295,7 +295,7 @@ VboParticles.prototype.draw = function(partVec) {
 
    // send to gfx system
 
-  // gl.uniform4f(u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
+  // gl.uniform4f(this.u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
 }
 
 VboParticles.prototype.reload = function() {

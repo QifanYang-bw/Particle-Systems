@@ -249,10 +249,9 @@ function main() {
   // ============================= PartSys Init ===================================
 
   partVec.init(2, forceList, limitList);
-  partVec.setPosition(0, 0, 0, 0);
-  partVec.setPosition(1, 0.5, 0.5, 0.5);
-  partVec.setMass(0, 1);
-  partVec.setMass(1, 1);
+
+  partVec.setRndPositions(2, 0.1, 1.7, 0.1, 1.7, 0.1, 1.7);
+  partVec.setRndMasses(1, 1);
 
   // ============================= Canvas Settings ===================================
 	

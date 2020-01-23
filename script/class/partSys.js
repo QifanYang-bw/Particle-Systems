@@ -7,6 +7,9 @@ PartVelLoc = 3;
 PartMLocSingle = 6;
 PartFLoc = 7;
 
+function randrange(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 function PartSys() {
 
@@ -57,6 +60,37 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 	this.limitList = arguments[2];
 
 	this.__initialized = true;
+
+}
+
+PartSys.prototype.setRndPositions = function(xposMin, xposMax, yposMin, yposMax, zposMin, zposMax) {
+
+	var j = 0;
+
+	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+
+		this.s1[j + PartPosLoc + 0] = randrange(xposMin, xposMax);
+		this.s1[j + PartPosLoc + 1] = randrange(yposMin, yposMax);
+		this.s1[j + PartPosLoc + 2] = randrange(zposMin, zposMax);
+
+	}
+
+}
+
+
+PartSys.prototype.setRndMasses = function(massMin, massMax) {
+
+	var j = 0;
+
+	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+
+		if (massMin == massMax) {
+			this.s1[j + PartMLocSingle] = massMax;
+		} else {
+			this.s1[j + PartMLocSingle] = randint(massMin, massMax);
+		}
+
+	}
 
 }
 
