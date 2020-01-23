@@ -180,9 +180,9 @@ var isClear = 1;		// 0 or 1 to enable or disable screen-clearing in the
 
 var partVec = new PartSys();
 var forceList = [new Gravity(), new Drag()];
-var limitList = [new AxisWall('x', 0.0, '+'), new AxisWall('x', 1.8, '-'),
-                 new AxisWall('y', 0.0, '+'), new AxisWall('y', 1.8, '-'),
-                 new AxisWall('z', 0.0, '+'), new AxisWall('z', 1.8, '-')];
+var limitList = [new AxisWall('x', -2, '+'), new AxisWall('x', 2, '-'),
+                 new AxisWall('y', -2, '+'), new AxisWall('y', 2, '-'),
+                 new AxisWall('z', 0, '+'), new AxisWall('z', 2, '-')];
 
 //============================== WebGL Global Variables ===============================
 
@@ -195,7 +195,7 @@ var a_PositionID, u_runModeID, u_ballShiftID, u_MvpMatrixID;
 
 var partBox, gridBox;
 
-var myVerts = 1;
+var nParticles = 100;
 
 function main() {
 
@@ -248,9 +248,9 @@ function main() {
 
   // ============================= PartSys Init ===================================
 
-  partVec.init(2, forceList, limitList);
+  partVec.init(nParticles, forceList, limitList);
 
-  partVec.setRndPositions(2, 0.1, 1.7, 0.1, 1.7, 0.1, 1.7);
+  partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
   partVec.setRndMasses(1, 1);
 
   // ============================= Canvas Settings ===================================
@@ -283,7 +283,7 @@ function main() {
                       // find out how much time passed since last screen redraw.
 
     drawResize();
-  	draw(myVerts);    // compute new particle state at current time
+  	draw();    // compute new particle state at current time
     requestAnimationFrame(tick, g_canvas);
                       // Call us again 'at next opportunity' as seen by the
                       // HTML-5 element 'g_canvas'.
@@ -304,7 +304,7 @@ function animate() {
   return elapsed;
 }
 
-function draw(n) {
+function draw() {
 //============================================================================== 
   // Clear WebGL frame-buffer? (The 'c' or 'C' key toggles isClear between 0 & 1).
   if(isClear == 1) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

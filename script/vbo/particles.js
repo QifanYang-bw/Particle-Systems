@@ -97,7 +97,11 @@ function VboParticles() {
 
   	            //---------------------- Uniform locations &values in our shaders
   	this.ModelMat = new Matrix4();	// Transforms CVV axes to model axes.
-  	this.u_ModelMatLoc;							// GPU location for u_ModelMat uniform
+
+    this.a_PositionID;
+    this.u_runModeID;
+    this.u_ballShiftID;
+    this.u_MvpMatrixID;
 }
 
 VboParticles.prototype.init = function() {
@@ -145,6 +149,8 @@ VboParticles.prototype.init = function() {
 
  // Write data from our JavaScript array to graphics systems' buffer object:
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+  //gl.burrderSubData
 
   // Get the ID# for the a_Position variable in the graphics hardware
   this.a_PositionID = gl.getAttribLocation(gl.program, 'a_Position');
@@ -277,9 +283,9 @@ VboParticles.prototype.draw = function(partVec) {
 
   var j = 0;
 
-  for (var i = 0; i < partVec.partCount; i++, j+=PartObjectSize) {
+  for (var i = 0; i < partVec.partCount; i++, j+=partVec.PartObjectSize) {
 
-    var loc = PartPosLoc + j;
+    var loc = partVec.PartPosLoc + j;
 
     gl.uniform4f(this.u_ballShiftID,
                  partVec.s1[loc + 0],

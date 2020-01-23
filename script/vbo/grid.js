@@ -259,7 +259,7 @@ VboGrid.prototype.adjust = function(vpMatrix) {
   this.ModelMat = new Matrix4(vpMatrix);
   
   this.ModelMat.translate( 0, -0, 0.0);  
-  this.ModelMat.scale(0.1, 0.1, 0.1);       // shrink by 10X:
+  this.ModelMat.scale(0.15, 0.15, 0.15);       // shrink by 10X:
   //  Transfer new uniforms' values to the GPU:-------------
   // Send  new 'ModelMat' values to the GPU's 'u_ModelMat1' uniform: 
   gl.uniformMatrix4fv(this.u_ModelMatLoc,	// GPU location of the uniform

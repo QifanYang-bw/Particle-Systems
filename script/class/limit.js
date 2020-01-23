@@ -42,10 +42,10 @@ AxisWall.prototype.applyLimit = function(p) {
 
 	var j = 0;
 
-	for (var i = 0; i < p.partCount; i++, j+=PartObjectSize) {
+	for (var i = 0; i < p.partCount; i++, j+=p.PartObjectSize) {
 
-		loc = j + PartPosLoc + this.inc;
-		loc2 = j + PartVelLoc + this.inc;
+		loc = j + p.PartPosLoc + this.inc;
+		loc2 = j + p.PartVelLoc + this.inc;
 
 		// if (this.pos == 0 && this.inc == 2) {
 		// 	console.log(p.s2[loc2])

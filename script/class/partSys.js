@@ -1,12 +1,3 @@
-// Const Definition
-
-PartObjectSize = 10;
-PartDim = 3;
-PartPosLoc = 0;
-PartVelLoc = 3;
-PartMLocSingle = 6;
-PartFLoc = 7;
-
 function randrange(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -19,7 +10,17 @@ function PartSys() {
 		(xpos, ypos, zpos, xvel, yvel, zvel, mass, xftot, yftot, zftot)
 	*/
 
+	// Const Definition
+
 	this.__initialized = false;
+
+	this.PartObjectSize = 10;
+	this.PartDim = 3;
+	
+	this.PartPosLoc = 0;
+	this.PartVelLoc = 3;
+	this.PartMLocSingle = 6;
+	this.PartFLoc = 7;
 
 	if (arguments.length > 0) {
 
@@ -50,7 +51,7 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 	}
 
 	this.partCount = arguments[0];
-	this.totalLength = this.partCount * PartObjectSize;
+	this.totalLength = this.partCount * this.PartObjectSize;
 
 	this.s1 = new Float32Array(this.totalLength);
 	this.s1dot = new Float32Array(this.totalLength);
@@ -67,11 +68,11 @@ PartSys.prototype.setRndPositions = function(xposMin, xposMax, yposMin, yposMax,
 
 	var j = 0;
 
-	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 
-		this.s1[j + PartPosLoc + 0] = randrange(xposMin, xposMax);
-		this.s1[j + PartPosLoc + 1] = randrange(yposMin, yposMax);
-		this.s1[j + PartPosLoc + 2] = randrange(zposMin, zposMax);
+		this.s1[j + this.PartPosLoc + 0] = randrange(xposMin, xposMax);
+		this.s1[j + this.PartPosLoc + 1] = randrange(yposMin, yposMax);
+		this.s1[j + this.PartPosLoc + 2] = randrange(zposMin, zposMax);
 
 	}
 
@@ -82,12 +83,12 @@ PartSys.prototype.setRndMasses = function(massMin, massMax) {
 
 	var j = 0;
 
-	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 
 		if (massMin == massMax) {
-			this.s1[j + PartMLocSingle] = massMax;
+			this.s1[j + this.PartMLocSingle] = massMax;
 		} else {
-			this.s1[j + PartMLocSingle] = randint(massMin, massMax);
+			this.s1[j + this.PartMLocSingle] = randint(massMin, massMax);
 		}
 
 	}
@@ -96,19 +97,19 @@ PartSys.prototype.setRndMasses = function(massMin, massMax) {
 
 PartSys.prototype.setPosition = function(serial, xpos, ypos, zpos) {
 
-	j = PartObjectSize * serial;
+	j = this.PartObjectSize * serial;
 
-	this.s1[j + PartPosLoc + 0] = xpos;
-	this.s1[j + PartPosLoc + 1] = ypos;
-	this.s1[j + PartPosLoc + 2] = zpos;
+	this.s1[j + this.PartPosLoc + 0] = xpos;
+	this.s1[j + this.PartPosLoc + 1] = ypos;
+	this.s1[j + this.PartPosLoc + 2] = zpos;
 }
 
 
 PartSys.prototype.setMass = function(serial, mass) {
 
-	j = PartObjectSize * serial;
+	j = this.PartObjectSize * serial;
 
-	this.s1[j + PartMLocSingle] = mass;
+	this.s1[j + this.PartMLocSingle] = mass;
 
 }
 
@@ -117,14 +118,38 @@ PartSys.prototype.addVelocityToAll = function(xvel, yvel, zvel) {
 
 	var j = 0;
 
-	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 
-		if (this.s1[j + PartVelLoc + 0] >= 0) this.s1[j + PartVelLoc + 0] += xvel;
-										 else this.s1[j + PartVelLoc + 0] -= xvel;
-		if (this.s1[j + PartVelLoc + 1] >= 0) this.s1[j + PartVelLoc + 1] += yvel;
-										 else this.s1[j + PartVelLoc + 1] -= yvel;
-		if (this.s1[j + PartVelLoc + 2] >= 0) this.s1[j + PartVelLoc + 2] += zvel;
-										 else this.s1[j + PartVelLoc + 2] -= zvel;
+		if (this.s1[j + this.PartVelLoc + 0] >= 0) this.s1[j + this.PartVelLoc + 0] += xvel;
+										 else this.s1[j + this.PartVelLoc + 0] -= xvel;
+		if (this.s1[j + this.PartVelLoc + 1] >= 0) this.s1[j + this.PartVelLoc + 1] += yvel;
+										 else this.s1[j + this.PartVelLoc + 1] -= yvel;
+		if (this.s1[j + this.PartVelLoc + 2] >= 0) this.s1[j + this.PartVelLoc + 2] += zvel;
+										 else this.s1[j + this.PartVelLoc + 2] -= zvel;
+	}
+
+}
+
+PartSys.prototype.addRandVelocityToAll = function(xvelMin, xvelMax, yvelMin, yvelMax, zvelMin, zvelMax) {
+
+	var j = 0;
+
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
+
+		if (this.s1[j + this.PartVelLoc + 0] >= 0)
+			this.s1[j + this.PartVelLoc + 0] += randrange(xvelMin, xvelMax);
+		else
+			this.s1[j + this.PartVelLoc + 0] -= randrange(xvelMin, xvelMax);
+
+		if (this.s1[j + this.PartVelLoc + 1] >= 0)
+			this.s1[j + this.PartVelLoc + 1] += randrange(yvelMin, yvelMax);
+		else
+			this.s1[j + this.PartVelLoc + 1] -= randrange(yvelMin, yvelMax);
+
+		if (this.s1[j + this.PartVelLoc + 2] >= 0)
+			this.s1[j + this.PartVelLoc + 2] += randrange(zvelMin, zvelMax);
+		else
+			this.s1[j + this.PartVelLoc + 2] -= randrange(zvelMin, zvelMax);
 	}
 
 }
@@ -139,10 +164,10 @@ PartSys.prototype.applyForces = function() {
 
 	// Clear all Forces
 	var j = 0;
-	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 
-		for (var inc = 0; inc < PartDim; inc++) {
-			this.s1[PartFLoc + j + inc] = 0;
+		for (var inc = 0; inc < this.PartDim; inc++) {
+			this.s1[this.PartFLoc + j + inc] = 0;
 		}
 
 	}
@@ -160,19 +185,19 @@ PartSys.prototype.dotFinder = function() {
 
 	var j = 0;
 
-	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 
-		for (var inc = 0; inc < PartDim; inc++) {
+		for (var inc = 0; inc < this.PartDim; inc++) {
 			var tinc = j + inc;
 
-			this.s1dot[PartPosLoc + tinc] = this.s1[PartVelLoc + tinc];
+			this.s1dot[this.PartPosLoc + tinc] = this.s1[this.PartVelLoc + tinc];
 
 			// Assuming constant Mass
 			// F = ma, a = F/m
-			this.s1dot[PartVelLoc + tinc] = this.s1[PartFLoc + tinc] / this.s1[PartMLocSingle + j];
+			this.s1dot[this.PartVelLoc + tinc] = this.s1[this.PartFLoc + tinc] / this.s1[this.PartMLocSingle + j];
 
-			if (Math.abs(this.s1dot[PartMLocSingle + j] - 0) > 1e-6) {
-				this.s1dot[PartVelLoc + tinc] += this.s1dot[PartMLocSingle + j] * this.s1[PartVelLoc + tinc]
+			if (Math.abs(this.s1dot[this.PartMLocSingle + j] - 0) > 1e-6) {
+				this.s1dot[this.PartVelLoc + tinc] += this.s1dot[this.PartMLocSingle + j] * this.s1[this.PartVelLoc + tinc]
 			}
 
 
@@ -197,23 +222,23 @@ PartSys.prototype.solver = function() {
 
 	var j = 0;
 
-	for (var i = 0; i < this.partCount; i++, j+=PartObjectSize) {
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 
-		this.s2[PartMLocSingle + j] = this.s1[PartMLocSingle + j] + this.s1dot[PartMLocSingle + j] * t;
+		this.s2[this.PartMLocSingle + j] = this.s1[this.PartMLocSingle + j] + this.s1dot[this.PartMLocSingle + j] * t;
 
-		for (var inc = 0; inc < PartDim; inc++) {
+		for (var inc = 0; inc < this.PartDim; inc++) {
 			var tinc = j + inc;
 
 			// Position is calculated last after Velocity 
 
-			this.s2[PartVelLoc + tinc] = this.s1[PartVelLoc + tinc] + this.s1dot[PartVelLoc + tinc] * t;
+			this.s2[this.PartVelLoc + tinc] = this.s1[this.PartVelLoc + tinc] + this.s1dot[this.PartVelLoc + tinc] * t;
 
 			// We don't need this for now:
-			// this.s2[PartFLoc + tinc] = this.s1[PartFLoc + tinc] + this.s1dot[PartFLoc + tinc] * t;
+			// this.s2[this.PartFLoc + tinc] = this.s1[this.PartFLoc + tinc] + this.s1dot[this.PartFLoc + tinc] * t;
 
 			// The stable trick!
 
-			this.s2[PartPosLoc + tinc] = this.s1[PartPosLoc + tinc] + this.s2[PartVelLoc + tinc] * t;
+			this.s2[this.PartPosLoc + tinc] = this.s1[this.PartPosLoc + tinc] + this.s2[this.PartVelLoc + tinc] * t;
 
 		}
 	}
