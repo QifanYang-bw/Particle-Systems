@@ -1,10 +1,11 @@
+// ==================== Wall Abstract Class ====================
 function CLimit() {
 	this.enabled = true;
 }
 
 CLimit.prototype.applyLimit = function() {
 	if (this.enabled) {
-		this.__applyLimit();
+		this.__applyLimit.apply(this, arguments);
 	}
 }
 
@@ -35,10 +36,10 @@ var AxisWall = function(axisType, axisPos, facing, bounciness = 1.0) {
 
 }
 
-AxisWall.prototype = Object.create(CForcer.prototype);
+AxisWall.prototype = Object.create(CLimit.prototype);
 AxisWall.prototype.constructor = AxisWall;
 
-AxisWall.prototype.applyLimit = function(p) {
+AxisWall.prototype.__applyLimit = function(p) {
 
 	var j = 0;
 
@@ -59,6 +60,65 @@ AxisWall.prototype.applyLimit = function(p) {
 
 			// console.log(p.s2[loc2])
 
+		}
+
+	}
+
+}
+
+// ==================== Fountain Respawn CLimit ====================
+var FountainRespawn = function(
+	ageLimit,
+	spawnPos,
+	spawnVelMin = null,
+	spawnVelMax = null
+) { 
+
+	CForcer.call(this);
+
+	this.spawnPos = spawnPos;
+	this.ageLimit = ageLimit;
+
+	if (spawnVelMin != null)
+		this.spawnVelMin = spawnVelMin;
+	else
+		this.spawnVelMin = [0, 0, 0];
+
+	if (spawnVelMax != null)
+		this.spawnVelMax = spawnVelMax;
+	else
+		this.spawnVelMax = [2, 2, 2];
+
+}
+
+FountainRespawn.prototype = Object.create(CLimit.prototype);
+FountainRespawn.prototype.constructor = FountainRespawn;
+
+FountainRespawn.prototype.__applyLimit = function(p) {
+
+	if (typeof p.PartObjectSize == 'undefined') {
+		throw new Error('partSys object has no age property!');
+		return;
+	}
+
+	var j = 0;
+
+	for (var i = 0; i < p.partCount; i++, j+=p.PartObjectSize) {
+
+		age = p.s2[j + p.PartAgeSingle];
+
+		if (age > this.ageLimit) {
+			// Remove the particle by 'respawning' it
+
+			for (var inc = 0; inc < this.PartDim; inc++) {
+
+				p.s2[p.PartPosLoc + j + inc] = this.spawnPos[inc];
+				p.s2[p.PartVelLoc + j + inc] = randrange(
+					this.spawnVelMin[inc],
+					this.spawnVelMax[inc]
+				);
+
+			}
 		}
 
 	}

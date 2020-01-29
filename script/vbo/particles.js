@@ -293,9 +293,14 @@ VboParticles.prototype.draw = function(partVec) {
                  partVec.s1[loc + 2],
                  0.0
                 ); 
+
     gl.drawArrays(gl.POINTS, 0, 1);
 
   }
+
+  console.log(partVec.s1);
+
+
 
   // This wouldn't hold for long, but it works for now
 

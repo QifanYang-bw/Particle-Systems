@@ -5,7 +5,7 @@ var CForcer = function() {
 
 CForcer.prototype.applyForce = function() {
 	if (this.enabled) {
-		this.__applyForce();
+		this.__applyForce.apply(this, arguments);
 	}
 }
 
@@ -15,21 +15,30 @@ var Gravity = function(g = 9.832) {
 	CForcer.call(this);
 
 	// Gravity only
-	this.g = g
+	this.g = g;
 
 }
 
 Gravity.prototype = Object.create(CForcer.prototype);
 Gravity.prototype.constructor = Gravity;
 
-Gravity.prototype.applyForce = function(p) {
+Gravity.prototype.__applyForce = function(p) {
+
+	console.log('before');
+  	console.log(partVec.s1);
 
 	var j = 0;
 	var zInc = 2; //y Axis
 
 	for (var i = 0; i < p.partCount; i++, j+=p.PartObjectSize) {
+
+		console.log(p.s1[p.PartFLoc + zInc + j], this.g);
 		p.s1[p.PartFLoc + zInc + j] -= this.g;
 	}
+
+	console.log('after');
+  	console.log(partVec.s1);
+	console.log('---');
 
 }
 
@@ -43,13 +52,13 @@ var Drag = function(coeff = 0.985) {
 	}
 
 	// Drag coeff only
-	this.revcoeff = 1 - coeff
+	this.revcoeff = 1 - coeff;
 
 }
 
 Drag.prototype = Object.create(CForcer.prototype);
 Drag.prototype.constructor = Drag;
-Drag.prototype.applyForce = function(p) {
+Drag.prototype.__applyForce = function(p) {
 
 	var j = 0;
 	var curcoeff = this.revcoeff * 1000 / g_timeStep;

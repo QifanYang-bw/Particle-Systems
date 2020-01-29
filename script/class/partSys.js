@@ -16,29 +16,31 @@ function PartSys() {
 
 	this.PartObjectSize = 10;
 	this.PartDim = 3;
-	
+
 	this.PartPosLoc = 0;
 	this.PartVelLoc = 3;
 	this.PartMLocSingle = 6;
 	this.PartFLoc = 7;
 
-	if (arguments.length > 0) {
+	// Initialization cannot be included due to possible inheritance
 
-		console.log(arguments);
+	// Temporarily Keeping the code
+	// if (arguments.length > 0) {
+	// 	console.log(arguments);
+	// 	if (arguments.length != 3) {
+	// 		throw new Error(
+	// 			'init() requires three arguments (partCount, forceList, limitList)!'
+	// 		);
+	// 	}
+	// 	this.init(arguments[0], arguments[1], arguments[2]);
+	// } else {
 
-		if (arguments.length != 3) {
-			throw new Error(
-				'init() requires three arguments (partCount, forceList, limitList)!'
-			);
-		}
+	this.partCount = 0;
 
-		this.init(arguments[0], arguments[1], arguments[2]);
+	// }
 
-	} else {
 
-		this.partCount = 0;
-
-	}
+	// console.log('hi from partsys');
 
 }
 
@@ -61,6 +63,24 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 	this.limitList = arguments[2];
 
 	this.__initialized = true;
+
+	console.log(this.partCount);
+
+}
+
+PartSys.prototype.renderFrame = function() {
+
+	if (!this.__initialized) {
+		throw new Error('PartSys object not initialized!');
+		return;
+	}
+
+    this.applyForces();
+    this.dotFinder();
+    this.solver();
+    this.doConstraint();
+    // this.render();
+    this.swap();
 
 }
 
@@ -159,9 +179,6 @@ PartSys.prototype.applyForces = function() {
 	// Use Forcer Set to find net forces Ftot on each particle in s1.
 	// Done within CForcer object
 
-	if (!this.__initialized) 
-		throw new Error('PartSys object not initialized!');
-
 	// Clear all Forces
 	var j = 0;
 	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
@@ -174,8 +191,10 @@ PartSys.prototype.applyForces = function() {
 
 	for (var i = 0; i < this.forceList.length; i++) {
 		this.forceList[i].applyForce(this);
+  		console.log(partVec.s1);
 	}
 
+	console.log('sep');
 	// Calculates s1(xftot, yftot, zftot)
 }
 

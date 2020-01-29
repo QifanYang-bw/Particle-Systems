@@ -1,172 +1,29 @@
-//3456789_123456789_123456789_123456789_123456789_123456789_123456789_123456789_
-// (JT: why the numbers? counts columns, helps me keep 80-char-wide listings)
-//
 // ORIGINAL SOURCE:
 // RotatingTranslatedTriangle.js (c) 2012 matsuda
 // HIGHLY MODIFIED to make:
 //
+// Starter Code:
 // BouncyBall.js  for EECS 351-1, 
 //									Northwestern Univ. Jack Tumblin
-//  BouncyBall01:---------------
-//		--converted to 2D->4D; 
-//		--3  verts changed to 'vCount' particles in one Vertex Buffer Object 
-//			(VBO) in initVertexBuffers() function
-//		--Fragment shader draw POINTS primitives as round and 'soft'
-//			by using the built-in variable 'gl_PointCoord' that exists ONLY for
-//			drawing WebGL's 'gl.POINTS' primitives, and no others.
 //
-// BouncyBall02:----------------
-//		--modified animation: removed rotation, added better animation comments, 
-//				replaced 'currentAngle' with 'g_timeStep'.
-//		--added keyboard & mouse controls:from EECS 351-1 Winter starter-code
- //				'5.04jt.ControlMulti.html'  (copied code almost verbatim)
-//				(for now, 1,2,3 keys just controls the color of our 3 particles) 
-//		--Added 'u_runMode' uniform to control particle-system animation.
-//
-//	BouncyBall03:---------------
-//		--Eliminated 'obsolete' junk commented out in BouncyBall02
-//		--initVertexBuffer() reduced to just one round particle; 
-//		--added 'uniform' vec4 'u_ballOffset' for that particle's position
-//		--in draw(), computed that offset as described in class in Week 1.
-//		--implement user controls: 
-//				--r or R key to ''refresh' or 'Reset' the bouncy ball;
-//				--p or P key to pause/unpause the bouncy ball;
-//				--SPACE BAR to single-step the bouncy ball.
-//
-//		04.goodMKS:-------------------
-//		--Convert bouncyBall03.js to MKS units (meters-kilograms-seconds): 
-//			On-screen position within the CVV (+/-1) now measured in meters; 
-//			particle mass now measured in Kg; g_timestep measured in seconds;
-//		--add on-screen displayMe() to show current parameters, incl. ball velocity
-//		--add 'c' or 'C' key to toggle WebGL screen-clearing in draw() fcn. 
-//				(NOTE: modifies creation of drawing-context 'gl' in main() too!)
-//		--add 'D/d' key to adjust drag up or down;
-//		--add 'G/g' key to adjust gravity up or down.
-//			See textbook: resolving collisions, & resting contacts;
-//			See BouncyBall05.solveFloors to see it implemented in 2D.
-//
-//		04.01badMKS:---------------------
-//		-- Convert bouncyBall03.01BAD.js to MKS units, as we did for 04.goodMKS
-//		'draw()' function in what SEEMS like the more sensible way -- and it fails,
-//		just as before, but now in MKS units (ball keeps bouncing forever!).
-//
-//		05.SolveFloors:------------------
-//		--add s/S key to toggle explicit/implicit solvers ('bad'/'good')
-//		--add b/B key to toggle between old/new way to bounce on floors/walls
-//		--add 'stepCount' to give each g_timestep a unique label for debugging;
-//		--add 'printBall()' to print current and previous ball pos & velocity.
-//				This is especially useful for debugging constraints & resting contact.
-//
-//    06.SolveFloors:-------------------
-//    --clearly label all global vars with 'g_' prefix: g_timeStep, etc.
-//    --improve r/R keys for more intuitive usage; better on-screen user guide
-
-//		NEXT TASKS:
-//		--Add 3D perspective camera; add user-controls to position & aim camera
-//		--Add ground-plane (xy==ground; +z==up)
-//		--extend particle system to 'bounce around' in a 3D box in world coords
-//		--THE BIG TASK for Week 2: 'state-variable' formulation!
-//			explore, experiment: how can we construct a 'state variable' that we
-//			store and calculate and update on the graphics hardware?  How can we 
-//			avoid transferring state vars from JavaScript to the graphics system
-//			on each and every g_timestep?
-//			-True, vertex shaders CAN'T modify attributes or uniforms (input only),
-//			-But we CAN make a global array of floats, of structs ...
-//				how could you use them?
-//				can you use Vertex Buffer objects to initialize those arrays, then
-//				use those arrays as your state variables?
-//				HINT: create an attribute that holds an integer 'particle number';
-//				use that as your array index for that particle... 
-//
-//==============================================================================
-// Vertex shader program:
-// var VSHADER_SOURCE =
-//   'precision mediump float;\n' +				// req'd in OpenGL ES if we use 'float'
-  
-//   'uniform   int u_runMode; \n' +					// particle system state: 
-//   																				// 0=reset; 1= pause; 2=step; 3=run
-//   'uniform	 vec4 u_ballShift; \n' +			// single bouncy-ball's movement
-
-//   'uniform   mat4 u_MvpMatrix; \n' +
-//   'attribute vec4 a_Position;\n' +
-
-//   'varying   vec4 v_Color; \n' +
-//   'void main() {\n' +
-//   '  gl_PointSize = 20.0;\n' +            // TRY MAKING THIS LARGER...
-//   '	 gl_Position = u_MvpMatrix * (a_Position + u_ballShift); \n' +	
-
-// 	// Let u_runMode determine particle color:
-//   '  if(u_runMode == 0) { \n' +
-// 	'	   v_Color = vec4(1.0, 0.0, 0.0, 1.0);	\n' +		// red: 0==reset
-// 	'  	 } \n' +
-// 	'  else if(u_runMode == 1) {  \n' +
-// 	'    v_Color = vec4(1.0, 1.0, 0.0, 1.0); \n' +	// yellow: 1==pause
-// 	'    }  \n' +
-// 	'  else if(u_runMode == 2) { \n' +    
-// 	'    v_Color = vec4(1.0, 1.0, 1.0, 1.0); \n' +	// white: 2==step
-//   '    } \n' +
-// 	'  else { \n' +
-// 	'    v_Color = vec4(0.2, 1.0, 0.2, 1.0); \n' +	// green: >3==run
-// 	'		 } \n' +
-//   '} \n';
-// Each instance computes all the on-screen attributes for just one VERTEX,
-// supplied by 'attribute vec4' variable a_Position, filled from the 
-// Vertex Buffer Object (VBO) we created inside the graphics hardware by calling 
-// the 'initVertexBuffers()' function. 
-
-//==============================================================================
-// Fragment shader program:
-// var FSHADER_SOURCE =
-//   'precision mediump float;\n' +
-//   'varying vec4 v_Color; \n' +
-//   'void main() {\n' +
-//   '  float dist = distance(gl_PointCoord, vec2(0.5, 0.5)); \n' +
-//   '  if(dist < 0.5) { \n' +	
-// 	'  	 gl_FragColor = vec4((1.0-2.0*dist)*v_Color.rgb, 1.0); \n' +
-// 	'  } else { \n' +
-//   '    discard; ' + 
-//   '  }\n' +
-//   '}\n';
-// --Each instance computes all the on-screen attributes for just one PIXEL.
-// --Draw large POINTS primitives as ROUND instead of square.  HOW?
-//   See pg. 377 in  textbook: "WebGL Programming Guide".  The vertex shaders' 
-// gl_PointSize value sets POINTS primitives' on-screen width and height, and
-// by default draws POINTS as a square on-screen.  In the fragment shader, the 
-// built-in input variable 'gl_PointCoord' gives the fragment's location within
-// that 2D on-screen square; value (0,0) at squares' lower-left corner, (1,1) at
-// upper right, and (0.5,0.5) at the center.  The built-in 'distance()' function
-// lets us discard any fragment outside the 0.5 radius of POINTS made circular.
-// (CHALLENGE: make a 'soft' point: color falls to zero as radius grows to 0.5)?
-// -- NOTE! gl_PointCoord is UNDEFINED for all drawing primitives except POINTS;
-// thus our 'draw()' function can't draw a LINE_LOOP primitive unless we turn off
-// our round-point rendering.  
-// -- All built-in variables: http://www.opengl.org/wiki/Built-in_Variable_(GLSL)
-
-// Global Variables
-// =========================
-// Use globals to avoid needlessly complex & tiresome function argument lists.
-// For example, the WebGL rendering context 'gl' gets used in almost every fcn;
-// requiring 'gl' as an argument won't give us any added 'encapsulation'; make
-// it global.  Later, if the # of global vars grows, we can unify them in to 
-// one (or just a few) sensible global objects for better modularity.
+// Student Assignment by Qifan Yang, 2020
 
 var gl;   // webGL Rendering Context.  Created in main(), used everywhere.
 var g_canvas; // our HTML-5 canvas object that uses 'gl' for drawing.
 
-var g_timeStep = 1000.0/60.0;			// current timestep (1/60th sec) in milliseconds
+var g_timeStep = 1000.0/60.0;     // current timestep (1/60th sec) in milliseconds
 var g_timeStepMin = g_timeStep;   // min,max timestep values since last keypress.
 var g_timeStepMax = g_timeStep;   // (initialized here)
 
-var g_last = Date.now();				//  Timestamp: set after each frame of animation,
-																// used by 'animate()' function to find how much
-																// time passed since we last updated our canvas.
-var g_stepCount = 0;						// Advances by 1 for each timestep, modulo 1000, 
-																// (0,1,2,3,...997,998,999,0,1,2,..) to identify 
-																// WHEN the ball bounces.  RESET by 'r' or 'R'.
+var g_last = Date.now();        //  Timestamp: set after each frame of animation,
+                                // used by 'animate()' function to find how much
+                                // time passed since we last updated our canvas.
+var g_stepCount = 0;            // Advances by 1 for each timestep, modulo 1000, 
+                                // (0,1,2,3,...997,998,999,0,1,2,..) to identify 
+                                // WHEN the ball bounces.  RESET by 'r' or 'R'.
 
-//=============================================================================
 
-// For keyboard, mouse-click-and-drag:		
+// For keyboard, mouse-click-and-drag
 var g_myRunMode = 3;	// particle system state: 0=reset; 1= pause; 2=step; 3=run
 
 var isDrag=false;		// mouse-drag: true when user holds down mouse button
@@ -178,11 +35,13 @@ var yMdragTot=0.0;
 var isClear = 1;		// 0 or 1 to enable or disable screen-clearing in the
 //									// draw() function. 'C' or 'c' key toggles in myKeyPress().
 
-var partVec = new PartSys();
+// var partVec = new PartSys();
+var partVec = new Fountain();
 var forceList = [new Gravity(), new Drag()];
 var limitList = [new AxisWall('x', -2, '+'), new AxisWall('x', 2, '-'),
                  new AxisWall('y', -2, '+'), new AxisWall('y', 2, '-'),
-                 new AxisWall('z', 0, '+'), new AxisWall('z', 2, '-')];
+                 new AxisWall('z', 0, '+'), new AxisWall('z', 2, '-'),
+                 new FountainRespawn(4, [0, 0, 1])];
 
 //============================== WebGL Global Variables ===============================
 
@@ -195,7 +54,7 @@ var a_PositionID, u_runModeID, u_ballShiftID, u_MvpMatrixID;
 
 var partBox, gridBox;
 
-var nParticles = 100;
+var nParticles = 2;
 
 function main() {
 
@@ -558,12 +417,7 @@ function draw() {
 
     if (g_myRunMode == 2) g_myRunMode = 1;     // (if 2, do just one step and pause.)
 
-    partVec.applyForces();
-    partVec.dotFinder();
-    partVec.solver();
-    partVec.doConstraint();
-    partVec.render();
-    partVec.swap();
+      partVec.renderFrame();
 
   }
     
