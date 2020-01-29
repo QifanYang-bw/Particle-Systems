@@ -298,7 +298,6 @@ VboParticles.prototype.draw = function(partVec) {
 
   }
 
-  console.log(partVec.s1);
 
 
 

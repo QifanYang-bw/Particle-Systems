@@ -191,7 +191,6 @@ PartSys.prototype.applyForces = function() {
 
 	for (var i = 0; i < this.forceList.length; i++) {
 		this.forceList[i].applyForce(this);
-  		console.log(partVec.s1);
 	}
 
 	console.log('sep');
