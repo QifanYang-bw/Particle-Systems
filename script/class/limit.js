@@ -82,12 +82,12 @@ var FountainRespawn = function(
 	if (spawnVelMin != null)
 		this.spawnVelMin = spawnVelMin;
 	else
-		this.spawnVelMin = [0, 0, 0];
+		this.spawnVelMin = [-4, -4, 1];
 
 	if (spawnVelMax != null)
 		this.spawnVelMax = spawnVelMax;
 	else
-		this.spawnVelMax = [2, 2, 2];
+		this.spawnVelMax = [4, 4, 10];
 
 }
 
@@ -105,12 +105,13 @@ FountainRespawn.prototype.__applyLimit = function(p) {
 
 	for (var i = 0; i < p.partCount; i++, j+=p.PartObjectSize) {
 
-		age = p.s2[j + p.PartAgeSingle];
-
-		if (age > this.ageLimit) {
+		if (p.s2[j + p.PartAgeSingle] > this.ageLimit) {
 			// Remove the particle by 'respawning' it
+			console.log('respawning');
 
-			for (var inc = 0; inc < this.PartDim; inc++) {
+			p.s2[j + p.PartAgeSingle] = randrange(0, this.ageLimit);
+
+			for (var inc = 0; inc < p.PartDim; inc++) {
 
 				p.s2[p.PartPosLoc + j + inc] = this.spawnPos[inc];
 				p.s2[p.PartVelLoc + j + inc] = randrange(
@@ -119,6 +120,9 @@ FountainRespawn.prototype.__applyLimit = function(p) {
 				);
 
 			}
+
+			// console.log(p.s2.slice(j, j + p.PartObjectSize));
+
 		}
 
 	}

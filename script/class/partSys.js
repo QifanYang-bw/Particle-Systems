@@ -64,7 +64,7 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 
 	this.__initialized = true;
 
-	console.log(this.partCount);
+	// console.log(this.partCount);
 
 }
 
@@ -193,7 +193,7 @@ PartSys.prototype.applyForces = function() {
 		this.forceList[i].applyForce(this);
 	}
 
-	console.log('sep');
+	// console.log('sep');
 	// Calculates s1(xftot, yftot, zftot)
 }
 

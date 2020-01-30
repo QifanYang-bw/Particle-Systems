@@ -1,6 +1,6 @@
 // ----------------------- Consts -------------------------
 var currentAngle = 0.0;
-var eyeX = 0.001, eyeY = 5.001, eyeZ = 1.001; 
+var eyeX = 5.001, eyeY = 5.001, eyeZ = 1.001; 
 // var focalEyeX = 0, focalEyeY = 0, focalEyeZ = .5;  
 var lookAtX = 0.0, lookAtY = 0.0, lookAtZ = 1.00;
 var tX = 0, tY = 0, tZ = 0;

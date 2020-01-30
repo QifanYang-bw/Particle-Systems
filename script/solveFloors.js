@@ -38,10 +38,10 @@ var isClear = 1;		// 0 or 1 to enable or disable screen-clearing in the
 // var partVec = new PartSys();
 var partVec = new Fountain();
 var forceList = [new Gravity(), new Drag()];
-var limitList = [new AxisWall('x', -2, '+'), new AxisWall('x', 2, '-'),
-                 new AxisWall('y', -2, '+'), new AxisWall('y', 2, '-'),
-                 new AxisWall('z', 0, '+'), new AxisWall('z', 2, '-'),
-                 new FountainRespawn(4, [0, 0, 1])];
+var limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
+                 new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
+                 new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-'),
+                 new FountainRespawn(4, [0, 0, 0.5])];
 
 //============================== WebGL Global Variables ===============================
 
@@ -54,7 +54,7 @@ var a_PositionID, u_runModeID, u_ballShiftID, u_MvpMatrixID;
 
 var partBox, gridBox;
 
-var nParticles = 2;
+var nParticles = 200;
 
 function main() {
 
@@ -473,6 +473,6 @@ function drawResize() {
   
   // g_canvas.width = window.innerWidth;
   g_canvas.width = document.body.clientWidth;
-  g_canvas.height = Math.max(window.innerHeight * 0.6, window.innerHeight - 300);
+  g_canvas.height = Math.max(window.innerHeight * 0.6, window.innerHeight);
   // console.log(window.innerWidth, window.innerWidth - 12);
 }
