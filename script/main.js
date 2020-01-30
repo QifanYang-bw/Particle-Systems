@@ -36,12 +36,15 @@ var isClear = 1;		// 0 or 1 to enable or disable screen-clearing in the
 //									// draw() function. 'C' or 'c' key toggles in myKeyPress().
 
 // var partVec = new PartSys();
+
+var fountainResp = new FountainRespawn(4, [0, 0, 0.5]);
+
 var partVec = new Fountain();
 var forceList = [new Gravity(), new Drag()];
 var limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
                  new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
                  new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-'),
-                 new FountainRespawn(4, [0, 0, 0.5])];
+                 fountainResp];
 
 //============================== WebGL Global Variables ===============================
 
@@ -107,9 +110,11 @@ function main() {
 
   // ============================= PartSys Init ===================================
 
+  console.log(limitList);
   partVec.init(nParticles, forceList, limitList);
 
-  partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
+  // partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
+  partVec.setStatus(fountainResp);
   partVec.setRndMasses(1, 1);
 
   // ============================= Canvas Settings ===================================

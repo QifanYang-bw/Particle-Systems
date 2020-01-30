@@ -46,6 +46,8 @@ function PartSys() {
 
 PartSys.prototype.init = function(partCount, forceList, limitList) {
 
+	console.log(arguments);
+
 	if (arguments.length != 3) {
 		throw new Error(
 			'init() requires three arguments (partCount, forceList, limitList)!'

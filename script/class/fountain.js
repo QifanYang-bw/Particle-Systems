@@ -22,10 +22,20 @@ Fountain.prototype.init = function() {
 
 	var j = 0;
 	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
-		this.s1[this.PartAgeSingle + j] = randrange(0, this.ageScaler);
+		// this.s1[this.PartAgeSingle + j] = randrange(0, this.ageScaler);
 		this.s1dot[this.PartAgeSingle + j] = this.ageScaler;
 	}
 
+}
+
+Fountain.prototype.setStatus = function(fRespawn) {
+
+	var j = 0;
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
+		this.s1[this.PartAgeSingle + j] = fRespawn.ageLimit + 1;
+	}
+
+	fRespawn.applyLimit(this);
 }
 
 Fountain.prototype.solver = function() {
