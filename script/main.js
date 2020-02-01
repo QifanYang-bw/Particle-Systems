@@ -37,7 +37,7 @@ var isClear = 1;		// 0 or 1 to enable or disable screen-clearing in the
 
 // var partVec = new PartSys();
 
-var fountainResp = new FountainRespawn(4, [0, 0, 0.5]);
+var fountainResp = new FountainRespawn(6, [0, 0, 0.5]);
 
 var partVec = new Fountain();
 var forceList = [new Gravity(), new Drag()];
