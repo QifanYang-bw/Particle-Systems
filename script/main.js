@@ -37,14 +37,17 @@ var isClear = 1;		// 0 or 1 to enable or disable screen-clearing in the
 
 // var partVec = new PartSys();
 
-var fountainResp = new FountainRespawn(6, [0, 0, 0.5]);
+// var fountainResp = new FountainRespawn(6, [0, 0, 0.5]);
 
-var partVec = new Fountain();
-var forceList = [new Gravity(), new Drag()];
-var limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
-                 new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
-                 new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-'),
-                 fountainResp];
+// var partVec = new Fountain();
+// var forceList = [new Gravity(), new Drag()];
+// var limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
+//                  new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
+//                  new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-'),
+//                  fountainResp];
+
+
+// var nParticles = 200;
 
 //============================== WebGL Global Variables ===============================
 
@@ -56,8 +59,6 @@ var vpMatrix;
 var a_PositionID, u_runModeID, u_ballShiftID, u_MvpMatrixID;
 
 var partBox, gridBox;
-
-var nParticles = 200;
 
 function main() {
 
@@ -101,21 +102,17 @@ function main() {
   //  		modifiers such as shift, alt, or ctrl.  I find these most useful for
   //			single-number and single-letter inputs that include SHIFT,CTRL,ALT.
 	// END Mouse & Keyboard Event-Handlers-----------------------------------
-	
-  gridBox = new VboGrid();
-  partBox = new VboParticles();
-
-  gridBox.init();
-  partBox.init();
 
   // ============================= PartSys Init ===================================
 
-  console.log(limitList);
-  partVec.init(nParticles, forceList, limitList);
+  initBoxes();
 
-  // partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
-  partVec.setStatus(fountainResp);
-  partVec.setRndMasses(1, 1);
+  // // console.log(limitList);
+  // partVec.init(nParticles, forceList, limitList);
+
+  // // partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
+  // partVec.setStatus(fountainResp);
+  // partVec.setRndMasses(1, 1);
 
   // ============================= Canvas Settings ===================================
 	
@@ -153,6 +150,16 @@ function main() {
                       // HTML-5 element 'g_canvas'.
   };
   tick();
+}
+
+function initBoxes() {
+
+  gridBox = new VboGrid();
+  partBox = new VboFountain();
+
+  gridBox.init();
+  partBox.init();
+
 }
 
 function animate() {
@@ -418,21 +425,21 @@ function draw() {
 
   // console.log(partVec.s1);
 
-  if(   g_myRunMode > 1) {                // 0=reset; 1= pause; 2=step; 3=run
+  // if(   g_myRunMode > 1) {                // 0=reset; 1= pause; 2=step; 3=run
 
-    if (g_myRunMode == 2) g_myRunMode = 1;     // (if 2, do just one step and pause.)
+  //   if (g_myRunMode == 2) g_myRunMode = 1;     // (if 2, do just one step and pause.)
 
-      partVec.renderFrame();
+  //   partVec.renderFrame();
 
-  }
+  // }
     
 
-  xposNow = partVec.s1[0];
-  yposNow = partVec.s1[1];
-  zposNow = partVec.s1[2];
-  xvelNow = partVec.s1[3];
-  yvelNow = partVec.s1[4];
-  zvelNow = partVec.s1[5];
+  xposNow = partBox.partVec.s1[0];
+  yposNow = partBox.partVec.s1[1];
+  zposNow = partBox.partVec.s1[2];
+  xvelNow = partBox.partVec.s1[3];
+  yvelNow = partBox.partVec.s1[4];
+  zvelNow = partBox.partVec.s1[5];
 
   displayMe();        // Display particle-system status on-screen.
 
@@ -456,7 +463,7 @@ function draw() {
     
   partBox.switchToMe();
   partBox.adjust(vpMatrix);
-  partBox.draw(partVec);
+  partBox.draw();
 
   gridBox.switchToMe();
   gridBox.adjust(vpMatrix);

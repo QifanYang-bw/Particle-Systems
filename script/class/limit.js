@@ -107,7 +107,7 @@ FountainRespawn.prototype.__applyLimit = function(p) {
 
 		if (p.s2[j + p.PartAgeSingle] > this.ageLimit) {
 			// Remove the particle by 'respawning' it
-			console.log('respawning');
+			// console.log('respawning');
 
 			p.s2[j + p.PartAgeSingle] = randrange(0, this.ageLimit);
 
