@@ -35,20 +35,6 @@ var yMdragTot=0.0;
 var isClear = 1;		// 0 or 1 to enable or disable screen-clearing in the
 //									// draw() function. 'C' or 'c' key toggles in myKeyPress().
 
-// var partVec = new PartSys();
-
-// var fountainResp = new FountainRespawn(6, [0, 0, 0.5]);
-
-// var partVec = new Fountain();
-// var forceList = [new Gravity(), new Drag()];
-// var limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
-//                  new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
-//                  new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-'),
-//                  fountainResp];
-
-
-// var nParticles = 200;
-
 //============================== WebGL Global Variables ===============================
 
 // Temperal Solution; Need changing
@@ -59,6 +45,8 @@ var vpMatrix;
 var a_PositionID, u_runModeID, u_ballShiftID, u_MvpMatrixID;
 
 var partBox, gridBox;
+
+var defaultVec;
 
 function main() {
 
@@ -84,6 +72,7 @@ function main() {
 	//
 	// First, register all mouse events found within our HTML-5 canvas:
 	// when user's mouse button goes down call mouseDown() function,etc
+
   g_canvas.onmousedown	=	function(ev){myMouseDown(ev) }; 
   g_canvas.onmousemove = 	function(ev){myMouseMove(ev) };				
   g_canvas.onmouseup = 		function(ev){myMouseUp(  ev) };
@@ -95,6 +84,7 @@ function main() {
 	window.addEventListener("keydown", myKeyDown, false);
 	window.addEventListener("keyup", myKeyUp, false);
 	window.addEventListener("keypress", myKeyPress, false);
+
   // The 'keyDown' and 'keyUp' events respond to ALL keys on the keyboard,
   // 			including shift,alt,ctrl,arrow, pgUp, pgDn,f1,f2...f12 etc. 
   //			I find these most useful for arrow keys; insert/delete; home/end, etc.
@@ -107,12 +97,6 @@ function main() {
 
   initBoxes();
 
-  // // console.log(limitList);
-  // partVec.init(nParticles, forceList, limitList);
-
-  // // partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
-  // partVec.setStatus(fountainResp);
-  // partVec.setRndMasses(1, 1);
 
   // ============================= Canvas Settings ===================================
 	
@@ -155,10 +139,12 @@ function main() {
 function initBoxes() {
 
   gridBox = new VboGrid();
-  partBox = new VboFountain();
+  partBox = new VboParticles();
 
   gridBox.init();
   partBox.init();
+
+  defaultVec = partBox.partVec;
 
 }
 
@@ -422,17 +408,6 @@ function draw() {
   }
 	
   // ============================= PartSys Update ===================================
-
-  // console.log(partVec.s1);
-
-  // if(   g_myRunMode > 1) {                // 0=reset; 1= pause; 2=step; 3=run
-
-  //   if (g_myRunMode == 2) g_myRunMode = 1;     // (if 2, do just one step and pause.)
-
-  //   partVec.renderFrame();
-
-  // }
-    
 
   xposNow = partBox.partVec.s1[0];
   yposNow = partBox.partVec.s1[1];

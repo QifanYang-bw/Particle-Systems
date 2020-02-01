@@ -83,6 +83,20 @@ function VboParticles() {
     '  }\n' +
     '}\n';
 
+    this.nParticles = 200;
+
+
+    this.partVec = new PartSys();
+    this.forceList = [new Gravity(), new Drag()];
+    this.limitList = [new AxisWall('x', -2, '+'), new AxisWall('x', 2, '-'),
+                 new AxisWall('y', -2, '+'), new AxisWall('y', 2, '-'),
+                 new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-')];
+
+
+    this.partVec.init(this.nParticles, this.forceList, this.limitList);
+    this.partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
+    this.partVec.setRndMasses(1, 1);
+
 
   //=============================================================================
 
@@ -243,6 +257,13 @@ VboParticles.prototype.adjust = function(vpMatrix) {
   						'.adjust() call you needed to call this.switchToMe()!!');
   }  
 
+  if(   g_myRunMode > 1) {                // 0=reset; 1= pause; 2=step; 3=run
+    if (g_myRunMode == 2) g_myRunMode = 1;     // (if 2, do just one step and pause.)
+
+    this.partVec.renderFrame();
+
+  }
+
   // this.ModelMat = new Matrix4(vpMatrix);
   
   // this.ModelMat.translate( 0, -0, 0.0);  
@@ -282,15 +303,15 @@ VboParticles.prototype.draw = function(partVec) {
 
 
   var j = 0;
+  
+  for (var i = 0; i < this.partVec.partCount; i++, j+=this.partVec.PartObjectSize) {
 
-  for (var i = 0; i < partVec.partCount; i++, j+=partVec.PartObjectSize) {
-
-    var loc = partVec.PartPosLoc + j;
+    var loc = this.partVec.PartPosLoc + j;
 
     gl.uniform4f(this.u_ballShiftID,
-                 partVec.s1[loc + 0],
-                 partVec.s1[loc + 1],
-                 partVec.s1[loc + 2],
+                 this.partVec.s1[loc + 0],
+                 this.partVec.s1[loc + 1],
+                 this.partVec.s1[loc + 2],
                  0.0
                 ); 
 
