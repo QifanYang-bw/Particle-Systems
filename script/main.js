@@ -139,7 +139,7 @@ function main() {
 function initBoxes() {
 
   gridBox = new VboGrid();
-  partBox = new VboParticles();
+  partBox = new VboFountain();
 
   gridBox.init();
   partBox.init();

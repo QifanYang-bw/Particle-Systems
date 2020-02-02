@@ -48,5 +48,5 @@ Fountain.prototype.solver = function() {
 	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 		this.s2[this.PartAgeSingle + j] = this.s1[this.PartAgeSingle + j] + this.s1dot[this.PartAgeSingle + j] * t;
 	}
-	// console.log(this.s2[this.PartAgeSingle]);
+	
 }
