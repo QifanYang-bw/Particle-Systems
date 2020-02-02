@@ -16,8 +16,8 @@ function renderBoxes(vpMatrix) {
   partBox.adjust(vpMatrix);
   partBox.draw();
 
-  // gridBox.switchToMe();
-  // gridBox.adjust(vpMatrix);
-  // gridBox.draw();
+  gridBox.switchToMe();
+  gridBox.adjust(vpMatrix);
+  gridBox.draw();
 
 }

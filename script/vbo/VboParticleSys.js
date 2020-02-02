@@ -155,17 +155,6 @@ VboParticleSys.prototype.init = function() {
     return -1;
   }
 
-  gl.vertexAttribPointer(this.a_PositionID, 
-          this.partVec.PartPosDim,  // # of values in this attrib (1,2,3,4) 
-          gl.FLOAT, // data type (usually gl.FLOAT)
-          false,    // use integer normalizing? (usually false)
-          this.partVec.PartObjectSize * this.FSIZE,  // Stride: #bytes from 1st stored value to next one
-          this.partVec.PartPosLoc * this.FSIZE); // Offset; #bytes from start of buffer to 
-                    // 1st stored attrib value we will actually use.
-
-  // Enable this assignment of the bound buffer to the a_Position variable:
-  gl.enableVertexAttribArray(this.a_PositionID);
-  
   // Get graphics system storage location of uniforms our shaders use:
   // (why? see  http://www.opengl.org/wiki/Uniform_(GLSL) )
   this.u_runModeID = gl.getUniformLocation(gl.program, 'u_runMode');
@@ -193,7 +182,18 @@ VboParticleSys.prototype.switchToMe = function() {
  //  //  instead connect to our own already-created-&-filled VBO.  This new VBO can 
  //  //    supply values to use as attributes in our newly-selected shader program:
 
-  // gl.bindBuffer(gl.ARRAY_BUFFER, this.vboLoc);
+  gl.bindBuffer(gl.ARRAY_BUFFER, this.vboLoc);
+
+  gl.vertexAttribPointer(this.a_PositionID, 
+          this.partVec.PartPosDim,  // # of values in this attrib (1,2,3,4) 
+          gl.FLOAT, // data type (usually gl.FLOAT)
+          false,    // use integer normalizing? (usually false)
+          this.partVec.PartObjectSize * this.FSIZE,  // Stride: #bytes from 1st stored value to next one
+          this.partVec.PartPosLoc * this.FSIZE); // Offset; #bytes from start of buffer to 
+                    // 1st stored attrib value we will actually use.
+
+  // Enable this assignment of the bound buffer to the a_Position variable:
+  gl.enableVertexAttribArray(this.a_PositionID);
 
  // // Write data from our JavaScript array to graphics systems' buffer object:
   // gl.bufferData(gl.ARRAY_BUFFER, this.partVec.s1, gl.STATIC_DRAW);
@@ -264,7 +264,6 @@ VboParticleSys.prototype.adjust = function(vpMatrix) {
   // 										false, 				// use matrix transpose instead?
   // 										this.ModelMat.elements);	// send data from Javascript.
 
-  // console.log(vpMatrix);
 
   gl.uniformMatrix4fv(this.u_MvpMatrixID, false, vpMatrix.elements);
 
