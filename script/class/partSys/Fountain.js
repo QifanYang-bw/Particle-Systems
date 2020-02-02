@@ -5,7 +5,7 @@ var Fountain = function() {
 	// console.log('hi');
 
 	// Fountain-only properties
-	this.PartAgeSingle = 10;
+	this.PartAgeSingle = this.PartObjectSize;
 	
 	this.PartObjectSize += 1;
 

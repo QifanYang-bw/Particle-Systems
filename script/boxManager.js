@@ -1,7 +1,7 @@
 function initBoxes() {
 
   gridBox = new VboGrid();
-  partBox = new VboSplatter();
+  partBox = new VboFountain();
 
   gridBox.init();
   partBox.init();
