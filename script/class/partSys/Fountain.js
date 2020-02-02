@@ -5,8 +5,9 @@ var Fountain = function() {
 	// console.log('hi');
 
 	// Fountain-only properties
-	this.PartObjectSize = 11;
 	this.PartAgeSingle = 10;
+	
+	this.PartObjectSize += 1;
 
 	this.ageScaler = 1;
 	this.ageLimit = 6;

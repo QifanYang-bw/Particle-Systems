@@ -14,13 +14,15 @@ function PartSys() {
 
 	this.__initialized = false;
 
-	this.PartObjectSize = 10;
+	this.PartObjectSize = 11;
+
+	this.PartPosDim = 4;
 	this.PartDim = 3;
 
 	this.PartPosLoc = 0;
-	this.PartVelLoc = 3;
-	this.PartMLocSingle = 6;
-	this.PartFLoc = 7;
+	this.PartVelLoc = 4;
+	this.PartMLocSingle = 7;
+	this.PartFLoc = 8;
 
 	// Initialization cannot be included due to possible inheritance
 
@@ -63,6 +65,13 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 
 	this.forceList = arguments[1];
 	this.limitList = arguments[2];
+
+	// Setting the variable w in projection matrix to 1
+	var j = 0;
+	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
+		this.s1[j + this.PartPosLoc + 3] = 1;
+		this.s2[j + this.PartPosLoc + 3] = 1;
+	}
 
 	this.__initialized = true;
 

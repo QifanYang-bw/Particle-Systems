@@ -46,29 +46,28 @@ function VboParticleSys() {
     'precision mediump float;\n' +        // req'd in OpenGL ES if we use 'float'
     
     'uniform   int u_runMode; \n' +         // particle system state: 
-                                            // 0=reset; 1= pause; 2=step; 3=run
-    'uniform   vec4 u_ballShift; \n' +      // single bouncy-ball's movement
+                                            // 0=reset; 1=pause; 2=step; 3=run
 
     'uniform   mat4 u_MvpMatrix; \n' +
     'attribute vec4 a_Position;\n' +
-
     'varying   vec4 v_Color; \n' +
+
     'void main() {\n' +
     '  gl_PointSize = 20.0;\n' +            // TRY MAKING THIS LARGER...
-    '  gl_Position = u_MvpMatrix * (a_Position + u_ballShift); \n' +  
+    '  gl_Position = u_MvpMatrix * a_Position; \n' +  
 
     '  if(u_runMode == 0) { \n' +    // Let u_runMode determine particle color:
     '    v_Color = vec4(1.0, 0.0, 0.0, 1.0);  \n' +   // red: 0==reset
-    '    } \n' +
+    '  } \n' +
     '  else if(u_runMode == 1) {  \n' +
     '    v_Color = vec4(1.0, 1.0, 0.0, 1.0); \n' +  // yellow: 1==pause
-    '    }  \n' +
+    '  }  \n' +
     '  else if(u_runMode == 2) { \n' +    
     '    v_Color = vec4(1.0, 1.0, 1.0, 1.0); \n' +  // white: 2==step
-    '    } \n' +
+    '  } \n' +
     '  else { \n' +
     '    v_Color = vec4(0.2, 1.0, 0.2, 1.0); \n' +  // green: >3==run
-    '    } \n' +
+    '  } \n' +
     '} \n';
 
   	this.FRAG_SRC = //---------------------- FRAGMENT SHADER source code 
@@ -105,33 +104,28 @@ function VboParticleSys() {
 
     this.a_PositionID;
     this.u_runModeID;
-    this.u_ballShiftID;
     this.u_MvpMatrixID;
+
+    this.FSIZE;
 }
 
 VboParticleSys.prototype.init = function() {
 
   // a) Compile,link,upload shaders-----------------------------------------------
-  	this.shaderLoc = createProgram(gl, this.VERT_SRC, this.FRAG_SRC);
-  	if (!this.shaderLoc) {
-      console.log(this.constructor.name + 
-      						'.init() failed to create executable Shaders on the GPU. Bye!');
-      return;
-    }
+	this.shaderLoc = createProgram(gl, this.VERT_SRC, this.FRAG_SRC);
+	if (!this.shaderLoc) {
+    console.log(this.constructor.name + 
+    						'.init() failed to create executable Shaders on the GPU.');
+    return;
+  }
 
 	gl.program = this.shaderLoc;		// (to match cuon-utils.js -- initShaders())
 
+  this.FSIZE = this.partVec.s1.BYTES_PER_ELEMENT;  // 'float' size, in bytes.
 
 
 //==============================================================================
 // Set up all buffer objects on our graphics hardware.
-  var vertices = new Float32Array ([      // JUST ONE particle:
- //    0.0,  0.5, 0.0, 1.0,           // x,y,z,w position
-      -0.9, -0.9, 0.0, 1.0,   
- //    0.5, -0.5, 0.0, 1.0,
-  ]);
-  var vcount = 1;   // The number of vertices
-  FSIZE = vertices.BYTES_PER_ELEMENT; // # bytes per floating-point value (global!)
 
   // Create a buffer object in the graphics hardware: get its ID# 
   this.vboLoc = gl.createBuffer();
@@ -151,10 +145,8 @@ VboParticleSys.prototype.init = function() {
 
   gl.bindBuffer(gl.ARRAY_BUFFER, this.vboLoc);
 
- // Write data from our JavaScript array to graphics systems' buffer object:
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-  //gl.burrderSubData
+ // // Write data from our JavaScript array to graphics systems' buffer object:
+  gl.bufferData(gl.ARRAY_BUFFER, this.partVec.s1, gl.DYNAMIC_DRAW);
 
   // Get the ID# for the a_Position variable in the graphics hardware
   this.a_PositionID = gl.getAttribLocation(gl.program, 'a_Position');
@@ -163,17 +155,22 @@ VboParticleSys.prototype.init = function() {
     return -1;
   }
 
+  gl.vertexAttribPointer(this.a_PositionID, 
+          this.partVec.PartPosDim,  // # of values in this attrib (1,2,3,4) 
+          gl.FLOAT, // data type (usually gl.FLOAT)
+          false,    // use integer normalizing? (usually false)
+          this.partVec.PartObjectSize * this.FSIZE,  // Stride: #bytes from 1st stored value to next one
+          this.partVec.PartPosLoc * this.FSIZE); // Offset; #bytes from start of buffer to 
+                    // 1st stored attrib value we will actually use.
+
+  // Enable this assignment of the bound buffer to the a_Position variable:
+  gl.enableVertexAttribArray(this.a_PositionID);
+  
   // Get graphics system storage location of uniforms our shaders use:
   // (why? see  http://www.opengl.org/wiki/Uniform_(GLSL) )
   this.u_runModeID = gl.getUniformLocation(gl.program, 'u_runMode');
   if(!this.u_runModeID) {
     console.log('Failed to get u_runMode variable location');
-    return;
-  }
-
-  this.u_ballShiftID = gl.getUniformLocation(gl.program, 'u_ballShift');
-  if(!this.u_ballShiftID) {
-    console.log('Failed to get u_ballShftID variable location');
     return;
   }
 
@@ -196,7 +193,10 @@ VboParticleSys.prototype.switchToMe = function() {
  //  //  instead connect to our own already-created-&-filled VBO.  This new VBO can 
  //  //    supply values to use as attributes in our newly-selected shader program:
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, this.vboLoc);
+  // gl.bindBuffer(gl.ARRAY_BUFFER, this.vboLoc);
+
+ // // Write data from our JavaScript array to graphics systems' buffer object:
+  // gl.bufferData(gl.ARRAY_BUFFER, this.partVec.s1, gl.STATIC_DRAW);
 
   //  // c) connect our newly-bound VBO to supply attribute variable values for each
   //  // vertex to our SIMD shader program, using 'vertexAttribPointer()' function.
@@ -204,15 +204,6 @@ VboParticleSys.prototype.switchToMe = function() {
   //    // 	Here's how to use the almost-identical OpenGL version of this function:
   //  	//		http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribPointer.xml )
 
-  gl.vertexAttribPointer(this.a_PositionID, 
-                          4,  // # of values in this attrib (1,2,3,4) 
-                          gl.FLOAT, // data type (usually gl.FLOAT)
-                          false,    // use integer normalizing? (usually false)
-                          4*FSIZE,  // Stride: #bytes from 1st stored value to next 
-                          0*FSIZE); // Offset; #bytes from start of buffer to 
-                                    // 1st stored attrib value we will actually use.
-  // Enable this assignment of the bound buffer to the a_Position variable:
-  gl.enableVertexAttribArray(this.a_PositionID);
 }
 
 VboParticleSys.prototype.isReady = function() {
@@ -254,6 +245,15 @@ VboParticleSys.prototype.adjust = function(vpMatrix) {
 
   }
 
+  gl.bufferSubData( 
+    gl.ARRAY_BUFFER,  // specify the 'binding target': either
+            //    gl.ARRAY_BUFFER (VBO holding sets of vertex attribs)
+            // or gl.ELEMENT_ARRAY_BUFFER (VBO holding vertex-index values)
+    0,      // offset: # of bytes to skip at the start of the VBO before 
+              // we begin data replacement.
+    this.partVec.s1 // Float32Array data source.
+  );
+
   // this.ModelMat = new Matrix4(vpMatrix);
   
   // this.ModelMat.translate( 0, -0, 0.0);  
@@ -284,30 +284,32 @@ VboParticleSys.prototype.draw = function(partVec) {
   						'.draw() call you needed to call this.switchToMe()!!');
   }  
 
-  // Draw just the ground-plane's vertices
-  // gl.drawArrays(gl.LINES,                 // use this drawing primitive, and
-  //               0, // start at this vertex number, and
-  //               this.vboVerts); // draw this many vertices.
-
   // Draw our VBO's contents:
 
+  // console.log(this.partVec.s1);
+  // Draw our VBO's new contents:
+  gl.drawArrays(gl.POINTS,          // mode: WebGL drawing primitive to use 
+                0,                  // index: start at this vertex in the VBO;
+                this.partVec.partCount);    // draw this many vertices.
 
-  var j = 0;
+
+
+  // var j = 0;
   
-  for (var i = 0; i < this.partVec.partCount; i++, j+=this.partVec.PartObjectSize) {
+  // for (var i = 0; i < this.partVec.partCount; i++, j+=this.partVec.PartObjectSize) {
 
-    var loc = this.partVec.PartPosLoc + j;
+  //   var loc = this.partVec.PartPosLoc + j;
 
-    gl.uniform4f(this.u_ballShiftID,
-                 this.partVec.s1[loc + 0],
-                 this.partVec.s1[loc + 1],
-                 this.partVec.s1[loc + 2],
-                 0.0
-                ); 
+  //   gl.uniform4f(this.u_ballShiftID,
+  //                this.partVec.s1[loc + 0],
+  //                this.partVec.s1[loc + 1],
+  //                this.partVec.s1[loc + 2],
+  //                0.0
+  //               ); 
 
-    gl.drawArrays(gl.POINTS, 0, 1);
+  //   gl.drawArrays(gl.POINTS, 0, 1);
 
-  }
+  // }
 
 
 
@@ -325,10 +327,10 @@ VboParticleSys.prototype.reload = function() {
 // gl.bufferSubData() call to re-transfer some or all of our Float32Array 
 // contents to our VBO without changing any GPU memory allocations.
 
- gl.bufferSubData(gl.ARRAY_BUFFER, 	// GLenum target(same as 'bindBuffer()')
-                  0,                  // byte offset to where data replacement
-                                      // begins in the VBO.
- 					 				this.vboContents);   // the JS source-data array used to fill VBO
+ // gl.bufferSubData(gl.ARRAY_BUFFER, 	// GLenum target(same as 'bindBuffer()')
+ //                  0,                  // byte offset to where data replacement
+ //                                      // begins in the VBO.
+ // 					 				this.vboContents);   // the JS source-data array used to fill VBO
 
 }
 /*

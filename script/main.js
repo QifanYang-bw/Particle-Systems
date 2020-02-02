@@ -422,14 +422,7 @@ function draw() {
                  lookAtX, lookAtY, lookAtZ,  // look-at point 
                  0,  0,  1);
  
-    
-  partBox.switchToMe();
-  partBox.adjust(vpMatrix);
-  partBox.draw();
-
-  gridBox.switchToMe();
-  gridBox.adjust(vpMatrix);
-  gridBox.draw();
+  renderBoxes(vpMatrix);
   
   // Report mouse-drag totals.
 	document.getElementById('MouseResult0').innerHTML=
