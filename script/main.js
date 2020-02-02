@@ -97,7 +97,6 @@ function main() {
 
   initBoxes();
 
-
   // ============================= Canvas Settings ===================================
 	
   gl.clearColor(0.08, 0.08, 0.07, 1);    // RGBA color for clearing WebGL framebuffer
@@ -134,18 +133,6 @@ function main() {
                       // HTML-5 element 'g_canvas'.
   };
   tick();
-}
-
-function initBoxes() {
-
-  gridBox = new VboGrid();
-  partBox = new VboFountain();
-
-  gridBox.init();
-  partBox.init();
-
-  defaultVec = partBox.partVec;
-
 }
 
 function animate() {

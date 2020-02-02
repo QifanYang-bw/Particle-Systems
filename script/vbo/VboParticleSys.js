@@ -27,10 +27,10 @@ var g_bounce = 1;       // floor-bounce constraint type:
                         // by falling below the floor.
 
 //=============================================================================
-function VboParticles() {
+function VboParticleSys() {
   //
   //=============================================================================
-  // CONSTRUCTOR for one re-usable 'VboParticles' object that holds all data and fcns
+  // CONSTRUCTOR for one re-usable 'VboParticleSys' object that holds all data and fcns
   // needed to render vertices from one Vertex Buffer Object (VBO) using one 
   // separate shader program (a vertex-shader & fragment-shader pair) and one
   // set of 'uniform' variables.
@@ -83,20 +83,11 @@ function VboParticles() {
     '  }\n' +
     '}\n';
 
-    this.nParticles = 200;
+    this.nParticles;
 
-
-    this.partVec = new PartSys();
-    this.forceList = [new Gravity(), new Drag()];
-    this.limitList = [new AxisWall('x', -2, '+'), new AxisWall('x', 2, '-'),
-                 new AxisWall('y', -2, '+'), new AxisWall('y', 2, '-'),
-                 new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-')];
-
-
-    this.partVec.init(this.nParticles, this.forceList, this.limitList);
-    this.partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
-    this.partVec.setRndMasses(1, 1);
-
+    this.partVec;
+    this.forceList;
+    this.limitList;
 
   //=============================================================================
 
@@ -118,7 +109,7 @@ function VboParticles() {
     this.u_MvpMatrixID;
 }
 
-VboParticles.prototype.init = function() {
+VboParticleSys.prototype.init = function() {
 
   // a) Compile,link,upload shaders-----------------------------------------------
   	this.shaderLoc = createProgram(gl, this.VERT_SRC, this.FRAG_SRC);
@@ -127,8 +118,6 @@ VboParticles.prototype.init = function() {
       						'.init() failed to create executable Shaders on the GPU. Bye!');
       return;
     }
-  // CUTE TRICK: let's print the NAME of this VBObox object: tells us which one!
-  //  else{console.log('You called: '+ this.constructor.name + '.init() fcn!');}
 
 	gl.program = this.shaderLoc;		// (to match cuon-utils.js -- initShaders())
 
@@ -159,6 +148,7 @@ VboParticles.prototype.init = function() {
   //  == "gl.ELEMENT_ARRAY_BUFFER" meaning the buffer object holds indices 
   //      into a list of values we need; indices such as object #s, face #s, 
   //      edge vertex #s.
+
   gl.bindBuffer(gl.ARRAY_BUFFER, this.vboLoc);
 
  // Write data from our JavaScript array to graphics systems' buffer object:
@@ -195,7 +185,7 @@ VboParticles.prototype.init = function() {
 
 }
 
-VboParticles.prototype.switchToMe = function() {
+VboParticleSys.prototype.switchToMe = function() {
   //==============================================================================
   // Set GPU to use this VBObox's contents (VBO, shader, attributes, uniforms...)
 
@@ -225,7 +215,7 @@ VboParticles.prototype.switchToMe = function() {
   gl.enableVertexAttribArray(this.a_PositionID);
 }
 
-VboParticles.prototype.isReady = function() {
+VboParticleSys.prototype.isReady = function() {
   //==============================================================================
   // Returns 'true' if our WebGL rendering context ('gl') is ready to render using
   // this objects VBO and shader program; else return false.
@@ -246,7 +236,7 @@ VboParticles.prototype.isReady = function() {
   return isOK;
 }
 
-VboParticles.prototype.adjust = function(vpMatrix) {
+VboParticleSys.prototype.adjust = function(vpMatrix) {
   //==============================================================================
   // Update the GPU to newer, current values we now store for 'uniform' vars on 
   // the GPU; and (if needed) update each attribute's stride and offset in VBO.
@@ -284,7 +274,7 @@ VboParticles.prototype.adjust = function(vpMatrix) {
   // gl.uniform4f(this.u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
 }
 
-VboParticles.prototype.draw = function(partVec) {
+VboParticleSys.prototype.draw = function(partVec) {
 //=============================================================================
 // Render current VBObox contents.
 
@@ -329,7 +319,7 @@ VboParticles.prototype.draw = function(partVec) {
   // gl.uniform4f(this.u_ballShiftID, xposNow, yposNow, zposNow, 0.0);  // send to gfx system
 }
 
-VboParticles.prototype.reload = function() {
+VboParticleSys.prototype.reload = function() {
 //=============================================================================
 // Over-write current values in the GPU inside our already-created VBO: use 
 // gl.bufferSubData() call to re-transfer some or all of our Float32Array 
@@ -342,7 +332,7 @@ VboParticles.prototype.reload = function() {
 
 }
 /*
-VboParticles.prototype.empty = function() {
+VboParticleSys.prototype.empty = function() {
 //=============================================================================
 // Remove/release all GPU resources used by this VBObox object, including any 
 // shader programs, attributes, uniforms, textures, samplers or other claims on 
@@ -357,7 +347,7 @@ VboParticles.prototype.empty = function() {
 //
 }
 
-VboParticles.prototype.restore = function() {
+VboParticleSys.prototype.restore = function() {
 //=============================================================================
 // Replace/restore all GPU resources used by this VBObox object, including any 
 // shader programs, attributes, uniforms, textures, samplers or other claims on 
