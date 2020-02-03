@@ -110,7 +110,7 @@ SpringPull.prototype.__applyForce = function() {
 
         force = this.springList[x].k * (dist - this.springList[x].l);
 
-        console.log(force);
+        // console.log(force);
 
         // Avoiding DivisionByZero Error
         ratio = force / (dist + 1e-6);
