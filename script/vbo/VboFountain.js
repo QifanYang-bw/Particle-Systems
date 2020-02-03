@@ -11,8 +11,7 @@ function VboFountain() {
     this.forceList = [new Gravity(), new Drag()];
     this.limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
                  new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
-                 new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-'),
-                 this.fountainResp];
+                 new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-')];
 
 
     this.partVec.init(this.nParticles, this.forceList, this.limitList);

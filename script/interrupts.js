@@ -466,7 +466,7 @@ function displayMe() {
 	document.getElementById('KeyResult').innerHTML = 
    			'<b>Solver = </b>' + solvType + 
    			'<b>Bounce = </b>' + bounceType +
-   			'<b>drag = </b>' + g_drag.toFixed(5) + 
+   			'<b>Particle #0:</b> <b>drag = </b>' + g_drag.toFixed(5) + 
    			', <b>grav = </b>' + g_grav.toFixed(5) +
    			' m/s^2; <b>xVel = +/-</b> ' + xvLimit.toFixed(5) + 
    			' m/s; <b>yVel = +/-</b> ' + yvLimit.toFixed(5) + 

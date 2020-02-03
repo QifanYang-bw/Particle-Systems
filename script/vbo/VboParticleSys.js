@@ -341,11 +341,6 @@ VboParticleSys.prototype.empty = function() {
 // 'restoreMe()': be sure to retain all our Float32Array data, all values for 
 // uniforms, all stride and offset values, etc.
 //
-//
-// 		********   YOU WRITE THIS! ********
-//
-//
-//
 }
 
 VboParticleSys.prototype.restore = function() {
@@ -354,11 +349,6 @@ VboParticleSys.prototype.restore = function() {
 // shader programs, attributes, uniforms, textures, samplers or other claims on 
 // GPU memory.  Use our retained Float32Array data, all values for  uniforms, 
 // all stride and offset values, etc.
-//
-//
-// 		********   YOU WRITE THIS! ********
-//
-//
 //
 }
 */

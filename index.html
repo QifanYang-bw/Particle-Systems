@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Activity Week 2 - 3D Bouncy Ball</title>
+    <title>Activity Week 3 -- A Single Spring</title>
     <style>
       body {
         background: #191919;
@@ -101,20 +101,23 @@
           Qifan Yang: QYL123
         </div>
       </div>
-
-    	<br> 
-    	<b>Particle System Controls (Some of them doesn't work):</b> 
+      * One particle has twice amount of mass compared to the other particle.
       <br>
-      <b>r/R key:</b> refresh/Reset. 
-      <b>Space-bar:</b> single-step.    
-      <b>p or P key:</b> pause/resume.	
-    	<br>
+      <br>
+    	<b>Particle System Controls</b>  (Some of them doesn't work):
+      <br>
+      <b>r key:</b> Add velocity; 
+      <b>Key '0':</b> Stop;
+      <b>Key '1':</b> Pause; 
+      <b>Key '2':</b> Stepping; 
+      <b>Key '3':</b> Resume. 
+<!--     	<br>
       <b>c or C key:</b> toggle clear-screen.  
     	<b>d/D key:</b> less/more drag.  
       <b>g/G key:</b> less/more gravity <br>
-      <b>s or S: switch solvers</b> (implicit vs. explicit) 
+      <b>s or S: switch solvers</b> (implicit vs. explicit)
       <br>
-      <b>b or B:</b> floor-bounce method
+      <b>b or B:</b> floor-bounce method  -->
     	<!-- Make 'div' elements to hold changeable HTML made in our JavaScript file;
     		 (where? look at the end of 'BouncyBall03.js' at 
     			myKeyPress(), myKeyDown() and myKeyUp() fcns)
@@ -149,6 +152,7 @@
 	-->
     <script src="script/vbo/VboGrid.js"></script>
     <script src="script/vbo/VboParticleSys.js"></script>
+    <script src="script/vbo/VboSingleSpring.js"></script>
     <script src="script/vbo/VboSplatter.js"></script>
     <script src="script/vbo/VboFountain.js"></script>
 
@@ -162,6 +166,7 @@
     <script src="script/class/forcer/CForcer.js"></script>
     <script src="script/class/forcer/Drag.js"></script>
     <script src="script/class/forcer/Gravity.js"></script>
+    <script src="script/class/forcer/SpringPull.js"></script>
 
     <script src="script/interrupts.js"></script>
     <script src="script/boxManager.js"></script>

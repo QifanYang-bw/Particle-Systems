@@ -5,6 +5,7 @@ var Gravity = function(g = 9.832) {
 
 	// Gravity only
 	this.g = g;
+	this.dInc = 2; //z axis
 
 }
 
@@ -13,20 +14,12 @@ Gravity.prototype.constructor = Gravity;
 
 Gravity.prototype.__applyForce = function(p) {
 
-	// console.log('before');
- //  	console.log(partVec.s1);
-
 	var j = 0;
-	var zInc = 2; //y Axis
 
 	for (var i = 0; i < p.partCount; i++, j+=p.PartObjectSize) {
 
-		// console.log(p.s1[p.PartFLoc + zInc + j], this.g);
-		p.s1[p.PartFLoc + zInc + j] -= this.g;
+		p.s1[p.PartFLoc + this.dInc + j] -= this.g;
 	}
 
-	// console.log('after');
- //  	console.log(partVec.s1);
-	// console.log('---');
 
 }

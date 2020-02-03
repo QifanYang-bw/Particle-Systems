@@ -66,7 +66,7 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 	this.forceList = arguments[1];
 	this.limitList = arguments[2];
 
-	// Setting the variable w in projection matrix to 1
+	// Setting the variable w in projection vector to 1
 	var j = 0;
 	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 		this.s1[j + this.PartPosLoc + 3] = 1;
@@ -108,7 +108,6 @@ PartSys.prototype.setRndPositions = function(xposMin, xposMax, yposMin, yposMax,
 	}
 
 }
-
 
 PartSys.prototype.setRndMasses = function(massMin, massMax) {
 
