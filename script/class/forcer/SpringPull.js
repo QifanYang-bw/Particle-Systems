@@ -72,11 +72,15 @@ SpringPull.prototype.setAllForcesInPlace = function(iArray, k) {
 
     var n = iArray.length;
 
+    console.log(n);
+
     for (var i1 = 0; i1 < n; i1++) {
-        for (var i2 = 0; i2 < n; i2++) {
+        for (var i2 = i1 + 1; i2 < n; i2++) {
             this.setForceInPlace(iArray[i1], iArray[i2], k);
         }
     }
+
+    console.log(this.springList);
 
 }
 
@@ -91,7 +95,7 @@ SpringPull.prototype.setAllForcesWithLength = function(iArray, k, l) {
     var n = iArray.length;
 
     for (var i1 = 0; i1 < n; i1++) {
-        for (var i2 = 0; i2 < n; i2++) {
+        for (var i2 = i1 + 1; i2 < n; i2++) {
             this.setForceWithLength(iArray[i1], iArray[i2], k, l);
         }
     }

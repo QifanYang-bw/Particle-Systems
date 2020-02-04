@@ -1,7 +1,7 @@
 function initBoxes() {
 
   gridBox = new VboGrid();
-  partBox = new VboSingleSpring();
+  partBox = new VboMultiSpring();
 
   gridBox.init();
   partBox.init();
