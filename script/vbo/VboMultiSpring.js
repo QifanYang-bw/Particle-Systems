@@ -9,7 +9,7 @@ function VboMultiSpring() {
 
     this.springForce = new SpringPull(this.partVec);
 
-    this.forceList = [new Gravity(), new Drag(0.96), this.springForce];
+    this.forceList = [new Gravity(), new Drag(0.95), this.springForce];
     this.limitList = [new AxisWall('x', -2, '+'), new AxisWall('x', 2, '-'),
                       new AxisWall('y', -2, '+'), new AxisWall('y', 2, '-'),
                       new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-')];
