@@ -21,28 +21,15 @@ function PartSys() {
 
 	this.PartPosLoc = 0;
 	this.PartVelLoc = 4;
+
+	this.PartPosVelNext = 7;
 	this.PartMLocSingle = 7;
 	this.PartFLoc = 8;
 
-	// Initialization cannot be included due to possible inheritance
-
-	// Temporarily Keeping the code
-	// if (arguments.length > 0) {
-	// 	console.log(arguments);
-	// 	if (arguments.length != 3) {
-	// 		throw new Error(
-	// 			'init() requires three arguments (partCount, forceList, limitList)!'
-	// 		);
-	// 	}
-	// 	this.init(arguments[0], arguments[1], arguments[2]);
-	// } else {
-
 	this.partCount = 0;
 
-	// }
-
-
-	// console.log('hi from partsys');
+	// this.solverFunction = solverFunc;
+	// console.log(solverFunc);
 
 }
 
@@ -88,7 +75,7 @@ PartSys.prototype.renderFrame = function() {
 
     this.applyForces();
     this.dotFinder();
-    this.solver();
+    this.solver(this);
     this.doConstraint();
     // this.render();
     this.swap();
@@ -237,39 +224,7 @@ PartSys.prototype.dotFinder = function() {
 
 PartSys.prototype.solver = function() {
 
-	// find next state (Euler/Explicit: s2 = s1+ h*s1dot)
-
-	// console.log(this.s1);
-	var t = g_timeStep * 0.001;
-
-	// for (var i = 0; i < this.totalLength; i++) {
-
-	// 	this.s2[i] = this.s1[i] + this.s1dot[i] * t;
-
-	// }
-
-	var j = 0;
-
-	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
-
-		this.s2[this.PartMLocSingle + j] = this.s1[this.PartMLocSingle + j] + this.s1dot[this.PartMLocSingle + j] * t;
-
-		for (var inc = 0; inc < this.PartDim; inc++) {
-			var tinc = j + inc;
-
-			// Position is calculated last after Velocity 
-
-			this.s2[this.PartVelLoc + tinc] = this.s1[this.PartVelLoc + tinc] + this.s1dot[this.PartVelLoc + tinc] * t;
-
-			// We don't need this for now:
-			// this.s2[this.PartFLoc + tinc] = this.s1[this.PartFLoc + tinc] + this.s1dot[this.PartFLoc + tinc] * t;
-
-			// The stable trick!
-
-			this.s2[this.PartPosLoc + tinc] = this.s1[this.PartPosLoc + tinc] + this.s2[this.PartVelLoc + tinc] * t;
-
-		}
-	}
+	solverFunc(this);
 
 }
 

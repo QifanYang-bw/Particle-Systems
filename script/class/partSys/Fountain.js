@@ -1,8 +1,7 @@
 var Fountain = function() { 
 
-	PartSys.call(this);
-
-	// console.log('hi');
+	// console.log(arguments);
+	PartSys.apply(this, arguments);
 
 	// Fountain-only properties
 	this.PartAgeSingle = this.PartObjectSize;
@@ -39,6 +38,7 @@ Fountain.prototype.setStatus = function(fRespawn) {
 	fRespawn.applyLimit(this);
 }
 
+/*
 Fountain.prototype.solver = function() {
 
 	PartSys.prototype.solver.apply(this, arguments);
@@ -51,3 +51,4 @@ Fountain.prototype.solver = function() {
 	}
 	
 }
+*/

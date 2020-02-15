@@ -3,7 +3,7 @@ function VboFountain() {
 
     VboParticleSys.call(this);
 
-    this.nParticles = 200;
+    this.nParticles = 800;
 
     this.fountainResp = new FountainRespawn(6, [0, 0, 0.5]);
 

@@ -1,5 +1,7 @@
 function initBoxes() {
 
+  solverFunc = solverLib.Implicit;
+
   gridBox = new VboGrid();
   partBox = new VboFountain();
 
