@@ -1,5 +1,5 @@
 // Define all the adjustable ball-movement parameters, and
-var INIT_VEL =  0.15 * 60.0;    // initial velocity in meters/sec.
+var INIT_VEL = 0.15 * 60.0;    // initial velocity in meters/sec.
                         // adjust by ++Start, --Start buttons. Original value 
                         // was 0.15 meters per timestep; multiply by 60 to get
                         // meters per second.
@@ -242,6 +242,7 @@ VboParticleSys.prototype.adjust = function(vpMatrix) {
     if (g_myRunMode == 2) g_myRunMode = 1;     // (if 2, do just one step and pause.)
 
     this.partVec.renderFrame();
+    // this.partVec.sampleParticleInfo(0);
 
   }
 
@@ -287,6 +288,8 @@ VboParticleSys.prototype.draw = function(partVec) {
 
   // console.log(this.partVec.s1);
   // Draw our VBO's new contents:
+
+  // console.log(this.partVec.partCount);
   gl.drawArrays(gl.POINTS,          // mode: WebGL drawing primitive to use 
                 0,                  // index: start at this vertex in the VBO;
                 this.partVec.partCount);    // draw this many vertices.

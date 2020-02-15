@@ -299,3 +299,19 @@ PartSys.prototype.swap = function() {
 	this.s2 = temp;
 
 }
+
+PartSys.prototype.sampleParticleInfo = function(id = -1) {
+
+	var sampleId;
+	if (id == -1) {
+		sampleId = Math.floor(randrange(0, this.partCount));
+	}
+	else
+	{
+		sampleId = id;
+	}
+
+	var startLoc = sampleId * this.PartObjectSize + this.PartPosLoc;
+	console.log("Sample ID: ", sampleId);
+	console.log("Sample Position: ", [this.s1[startLoc + 0], this.s1[startLoc + 1], this.s1[startLoc + 2]]);
+}
