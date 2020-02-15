@@ -1,3 +1,5 @@
+var solverFunc;
+
 function initBoxes() {
 
   solverFunc = solverLib.Implicit;
