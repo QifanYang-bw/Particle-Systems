@@ -150,8 +150,10 @@
 
 	<!--	Finally, load in our own JavaScript program file.
 	-->
+    <!--================== Abstract Vbo ===================-->
+    <script src="script/vbo/abs_VboParticleSys.js"></script>
+    <!--=======================================================-->
     <script src="script/vbo/VboGrid.js"></script>
-    <script src="script/vbo/VboParticleSys.js"></script>
     <script src="script/vbo/VboSplatter.js"></script>
     <script src="script/vbo/VboFountain.js"></script>
 
@@ -161,15 +163,20 @@
     <script src="script/class/partSys/PartSys.js"></script>
     <script src="script/class/partSys/Fountain.js"></script>
 
-    <script src="script/class/limiter/CLimit.js"></script>
+    <!--================== Abstract Limiter ===================-->
+    <script src="script/class/limiter/abs_CLimit.js"></script>
+    <!--====================================================-->
     <script src="script/class/limiter/AxisWall.js"></script>
     <script src="script/class/limiter/FountainRespawn.js"></script>
 
-    <script src="script/class/forcer/CForcer.js"></script>
+    <!--================== Abstract Forcer ===================-->
+    <script src="script/class/forcer/abs_CForcer.js"></script>
+    <!--====================================================-->
     <script src="script/class/forcer/Drag.js"></script>
     <script src="script/class/forcer/Gravity.js"></script>
     <script src="script/class/forcer/SpringPull.js"></script>
 
+    <!--================== Main Function ===================-->
     <script src="script/interrupts.js"></script>
     <script src="script/boxManager.js"></script>
     <script src="script/main.js"></script>
