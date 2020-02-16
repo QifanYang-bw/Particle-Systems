@@ -2,8 +2,6 @@
 var FireRespawn = function(
 	ageLimit,
 	spawnPos,
-	spawnVelMin = null,
-	spawnVelMax = null
 ) { 
 
 	CForcer.call(this);
@@ -11,15 +9,11 @@ var FireRespawn = function(
 	this.spawnPos = spawnPos;
 	this.ageLimit = ageLimit;
 
-	if (spawnVelMin != null)
-		this.spawnVelMin = spawnVelMin;
-	else
-		this.spawnVelMin = [-2, -2, 2];
+	this.spawnAreaMin = [-.1, -.1, -.25];
+	this.spawnAreaMax = [.1, .1, .25];
 
-	if (spawnVelMax != null)
-		this.spawnVelMax = spawnVelMax;
-	else
-		this.spawnVelMax = [2, 2, 4];
+	this.spawnVelMin = [-.5, -.5, .5];
+	this.spawnVelMax = [.5, .5, 1.2];
 
 	this.spawnColor = RGBIntToFloat([255, 221, 0]);
 	this.spawnColor.push(1.0);
@@ -50,7 +44,7 @@ FireRespawn.prototype.__applyLimit = function(p) {
 
 			for (var inc = 0; inc < p.PartDim; inc++) {
 
-				p.s2[p.PartPosLoc + j + inc] = this.spawnPos[inc];
+				p.s2[p.PartPosLoc + j + inc] = this.spawnPos[inc] + randrange(this.spawnAreaMin[inc], this.spawnAreaMax[inc]);
 				p.s2[p.PartVelLoc + j + inc] = randrange(
 					this.spawnVelMin[inc],
 					this.spawnVelMax[inc]
@@ -60,7 +54,7 @@ FireRespawn.prototype.__applyLimit = function(p) {
 
 			for (var inc = 0; inc < p.PartColorDim; inc++) {
 				p.s2[p.PartColorLoc + j + inc] = this.spawnColor[inc];
-				p.s1dot[p.PartColorLoc + j + inc] = (this.dyingColor[inc] - this.spawnColor[inc]) / p.s2[j + p.PartAgeSingle];
+				p.s1dot[p.PartColorLoc + j + inc] = (this.dyingColor[inc] - this.spawnColor[inc]) / p.s2[j + p.PartAgeSingle] * randrange(0.8, 1.2);
 			}
 
 			// console.log(p.s2.slice(j, j + p.PartObjectSize));

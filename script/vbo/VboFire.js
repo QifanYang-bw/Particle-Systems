@@ -23,7 +23,7 @@ function VboFire() {
         'varying   vec4 v_Color; \n' +
 
         'void main() {\n' +
-        '  gl_PointSize = 6.0;\n' +
+        '  gl_PointSize = 2.5;\n' +
         '  gl_Position = u_MvpMatrix * a_Position; \n' +  
 
         '  if(u_runMode == 0) { \n' +    // Let u_runMode determine particle color:
@@ -44,7 +44,7 @@ function VboFire() {
         'void main() {\n' +
         '  float dist = distance(gl_PointCoord, vec2(0.5, 0.5)); \n' +
         '  if(dist < 0.5) { \n' + 
-        '    gl_FragColor = vec4((1.0-2.0*dist)*v_Color.rgb, 1.0); \n' +
+        '    gl_FragColor = vec4((1.0-1.0*dist)*v_Color.rgb, 1); \n' +
         '  } else { \n' +
         '    discard; ' + 
         '  }\n' +
@@ -55,11 +55,12 @@ function VboFire() {
     this.a_AgeID;
     this.a_ColorID;
 
-    this.nParticles = 1500;
+    this.nParticles = 50000;
+    this.ageLimit = 1.5;
 
-    this.fireResp = new FireRespawn(4, [0, 0, 0.5]);
+    this.fireResp = new FireRespawn(this.ageLimit, [0, 0, 0.5]);
 
-    this.forceList = [new Gravity(.3), new Drag()];
+    this.forceList = [new Gravity(.2), new Drag()];
     this.limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
                  new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
                  new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-'),
