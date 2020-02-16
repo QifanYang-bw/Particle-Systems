@@ -64,34 +64,39 @@ SpringPull.prototype._distonVec = function(v) {
 }
 
 SpringPull.prototype.setForceInPlace = function(i1, i2, k) {
-
     this.springList.push(new SpringPullPair(i1, i2, k, this._distonIndex(i1, i2)));
 }
 
-SpringPull.prototype.setAllForcesInPlace = function(iArray, k) {
-
+SpringPull.prototype.setChainForcesInPlace = function(iArray, k) {
     var n = iArray.length;
+    for (var i1 = 0; i1 < n - 1; i1++) {
+        this.setForceInPlace(iArray[i1], iArray[i1 + 1], k);
+    }
+}
 
-    // console.log(n);
+SpringPull.prototype.setAllForcesInPlace = function(iArray, k) {
+    var n = iArray.length;
 
     for (var i1 = 0; i1 < n; i1++) {
         for (var i2 = i1 + 1; i2 < n; i2++) {
             this.setForceInPlace(iArray[i1], iArray[i2], k);
         }
     }
-
-    // console.log(this.springList);
-
 }
 
 SpringPull.prototype.setForceWithLength = function(i1, i2, k, l) {
-
     this.springList.push(new SpringPullPair(i1, i2, k, l));
+}
 
+SpringPull.prototype.setChainForcesWithLength = function(iArray, k, l) {
+    var n = iArray.length;
+
+    for (var i1 = 0; i1 < n - 1; i1++) {
+        this.setForceWithLength(iArray[i1], iArray[i1 + 1], k, l);
+    }
 }
 
 SpringPull.prototype.setAllForcesWithLength = function(iArray, k, l) {
-
     var n = iArray.length;
 
     for (var i1 = 0; i1 < n; i1++) {
@@ -99,7 +104,6 @@ SpringPull.prototype.setAllForcesWithLength = function(iArray, k, l) {
             this.setForceWithLength(iArray[i1], iArray[i2], k, l);
         }
     }
-
 }
 
 

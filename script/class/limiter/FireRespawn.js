@@ -54,7 +54,7 @@ FireRespawn.prototype.__applyLimit = function(p) {
 
 			for (var inc = 0; inc < p.PartColorDim; inc++) {
 				p.s2[p.PartColorLoc + j + inc] = this.spawnColor[inc];
-				p.s1dot[p.PartColorLoc + j + inc] = (this.dyingColor[inc] - this.spawnColor[inc]) / p.s2[j + p.PartAgeSingle] * randrange(0.8, 1.2);
+				p.s1dot[p.PartColorLoc + j + inc] = (this.dyingColor[inc] - this.spawnColor[inc]) / p.s2[j + p.PartAgeSingle];// * randrange(0.8, 1.2);
 			}
 
 			// console.log(p.s2.slice(j, j + p.PartObjectSize));

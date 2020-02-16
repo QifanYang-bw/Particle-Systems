@@ -111,7 +111,7 @@ function VboParticleSys() {
 
 VboParticleSys.prototype.init = function() {
 
-  console.log(this.VERT_SRC);
+  // console.log(this.VERT_SRC);
 
   // a) Compile,link,upload shaders-----------------------------------------------
 	this.shaderLoc = createProgram(gl, this.VERT_SRC, this.FRAG_SRC);
@@ -152,7 +152,7 @@ VboParticleSys.prototype.init = function() {
 
   // Get the ID# for the a_Position variable in the graphics hardware
   this.a_PositionID = gl.getAttribLocation(gl.program, 'a_Position');
-  console.log(this.a_PositionID);
+  // console.log(this.a_PositionID);
   if(this.a_PositionID < 0) {
     console.log('Failed to get the storage location of a_Position');
     return -1;
@@ -161,7 +161,7 @@ VboParticleSys.prototype.init = function() {
   // Get graphics system storage location of uniforms our shaders use:
   // (why? see  http://www.opengl.org/wiki/Uniform_(GLSL) )
   this.u_runModeID = gl.getUniformLocation(gl.program, 'u_runMode');
-  console.log(this.u_runModeID);
+  // console.log(this.u_runModeID);
   if(!this.u_runModeID) {
     console.log('Failed to get u_runMode variable location');
     return;

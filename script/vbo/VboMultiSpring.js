@@ -3,7 +3,7 @@ function VboMultiSpring() {
 
     VboParticleSys.call(this);
 
-    this.nParticles = 8;
+    this.nParticles = 16;
 
     this.partVec = new PartSys();
 
@@ -15,19 +15,32 @@ function VboMultiSpring() {
                       new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-')];
 
     this.partVec.init(this.nParticles, this.forceList, this.limitList);
-    this.partVec.setPosition(0, 0, 0, .5);
-    this.partVec.setPosition(1, 0, .5, .5);
-    this.partVec.setPosition(2, .5, 0, .5);
-    this.partVec.setPosition(3, .5, .5, .5);
-    this.partVec.setPosition(4, 0, 0, 1);
-    this.partVec.setPosition(5, 0, .5, 1);
-    this.partVec.setPosition(6, .5, 0, 1);
-    this.partVec.setPosition(7, .5, .5, 1);
+
+    var count = 0;
+    for (var i = 0; i <= 1; i++) 
+        for (var j = 0; j <= 1; j++)
+            for (var k = 0; k <= 1; k++) {
+                this.partVec.setPosition(count, -1 + i * .5, 1 + j * .5, .5 + k * .5);
+                count++;
+            }
+
+    for (var i = 0; i <= 1; i++) 
+        for (var j = 0; j <= 1; j++)
+            for (var k = 0; k <= 1; k++) {
+                this.partVec.setPosition(count, 1 + i * .5, -1 + j * .5, .5 + k * .5);
+                count++;
+            }
+
 
     this.partVec.setRndMasses(1, 1);
     // this.partVec.setMass(0, 1.2);
 
     this.springForce.setAllForcesInPlace([0, 1, 2, 3, 4, 5, 6, 7], 100); //iArray, k
+    this.springForce.setAllForcesInPlace([8, 9, 10, 11, 12, 13, 14, 15], 100); //iArray, k
+
+    this.springForce.setForceWithLength(7, 8, 10, .6); //iArray, k
+
+    console.log(this.springForce.springList);
 
 }   
 

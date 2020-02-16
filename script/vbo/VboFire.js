@@ -17,13 +17,15 @@ function VboFire() {
 
         'uniform   mat4 u_MvpMatrix; \n' +
         'attribute vec4 a_Position; \n' +
-        'attribute vec4 a_Age; \n' +
+
+        // 'attribute float a_Age; \n' +
+
         'attribute vec4 a_Color; \n' +
 
         'varying   vec4 v_Color; \n' +
 
         'void main() {\n' +
-        '  gl_PointSize = 2.5;\n' +
+        '  gl_PointSize = 4.0;\n' +
         '  gl_Position = u_MvpMatrix * a_Position; \n' +  
 
         '  if(u_runMode == 0) { \n' +    // Let u_runMode determine particle color:
@@ -52,10 +54,10 @@ function VboFire() {
     }
 
     // Add extra attribute pointers
-    this.a_AgeID;
+    // this.a_AgeID;
     this.a_ColorID;
 
-    this.nParticles = 50000;
+    this.nParticles = 10000;
     this.ageLimit = 1.5;
 
     this.fireResp = new FireRespawn(this.ageLimit, [0, 0, 0.5]);
@@ -81,11 +83,12 @@ VboFire.prototype.init = function() {
 
     VboParticleSys.prototype.init.apply(this, arguments);
 
-    this.a_AgeID = gl.getAttribLocation(gl.program, 'a_Age');
-    if(this.a_a_AgeID < 0) {
-        console.log('Failed to get the storage location of a_Age');
-        return -1;
-    }
+    // this.a_AgeID = gl.getAttribLocation(gl.program, 'a_Age');
+    // console.log(this.a_AgeID);
+    // if(this.a_AgeID < 0) {
+    //     console.log('Failed to get the storage location of a_Age');
+    //     return -1;
+    // }
     
     this.a_ColorID = gl.getAttribLocation(gl.program, 'a_Color');
     if(this.a_ColorID < 0) {
@@ -99,17 +102,17 @@ VboFire.prototype.switchToMe = function() {
 
     VboParticleSys.prototype.switchToMe.apply(this, arguments);
 
-    // Load Age
-    gl.vertexAttribPointer(this.a_AgeID, 
-        1,  // # of values in this attrib (1,2,3,4) 
-        gl.FLOAT, // data type (usually gl.FLOAT)
-        false,    // use integer normalizing? (usually false)
-        this.partVec.PartObjectSize * this.FSIZE,  // Stride: #bytes from 1st stored value to next one
-        this.partVec.PartAgeSingle * this.FSIZE); // Offset; #bytes from start of buffer to 
-                    // 1st stored attrib value we will actually use.
+    // // Load Age
+    // gl.vertexAttribPointer(this.a_AgeID, 
+    //     1,  // # of values in this attrib (1,2,3,4) 
+    //     gl.FLOAT, // data type (usually gl.FLOAT)
+    //     false,    // use integer normalizing? (usually false)
+    //     this.partVec.PartObjectSize * this.FSIZE,  // Stride: #bytes from 1st stored value to next one
+    //     this.partVec.PartAgeSingle * this.FSIZE); // Offset; #bytes from start of buffer to 
+    //                 // 1st stored attrib value we will actually use.
 
-    // Enable this assignment of the bound buffer to the a_Position variable:
-    gl.enableVertexAttribArray(this.a_AgeID);
+    // // Enable this assignment of the bound buffer to the a_Position variable:
+    // gl.enableVertexAttribArray(this.a_AgeID);
 
     // Load Color
     gl.vertexAttribPointer(this.a_ColorID, 

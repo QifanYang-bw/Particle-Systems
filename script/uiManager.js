@@ -77,8 +77,8 @@ var SettingsManager = function() {
 
 	this.ForceField = false;
 	this.Flocks = false;
-	this.Flame = true;
-	this.Springs = false;
+	this.Flame = false;
+	this.Springs = true;
 
 	this.Solver = 1;
 };
