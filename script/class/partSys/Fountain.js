@@ -9,7 +9,7 @@ var Fountain = function() {
 	this.PartObjectSize += 1;
 
 	this.ageScaler = 1;
-	this.ageLimit = 6;
+	// this.ageLimit = 6;
 	// this.ageInitialized = false;
 
 }

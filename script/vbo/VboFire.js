@@ -3,7 +3,11 @@ function VboFire() {
 
     VboParticleSys.call(this);
 
+    // Set Part
+    this.partVec = new Fire();
+
     // Rewrite shaders
+    // if (false)
     {
         this.VERT_SRC = 
         'precision mediump float;\n' +        // req'd in OpenGL ES if we use 'float'
@@ -12,30 +16,31 @@ function VboFire() {
                                                 // 0=reset; 1=pause; 2=step; 3=run
 
         'uniform   mat4 u_MvpMatrix; \n' +
-        'attribute vec4 a_Position;\n' +
+        'attribute vec4 a_Position; \n' +
+        'attribute vec4 a_Age; \n' +
+        'attribute vec4 a_Color; \n' +
+
         'varying   vec4 v_Color; \n' +
 
         'void main() {\n' +
-        '  gl_PointSize = 20.0;\n' +            // TRY MAKING THIS LARGER...
+        '  gl_PointSize = 6.0;\n' +
         '  gl_Position = u_MvpMatrix * a_Position; \n' +  
 
         '  if(u_runMode == 0) { \n' +    // Let u_runMode determine particle color:
-        '    v_Color = vec4(1.0, 0.0, 0.0, 1.0);  \n' +   // red: 0==reset
+        '    v_Color = vec4(1.0, 1.0, 1.0, 1.0);  \n' +   // red: 0==reset
         '  } \n' +
         '  else if(u_runMode == 1) {  \n' +
         '    v_Color = vec4(1.0, 1.0, 0.0, 1.0); \n' +  // yellow: 1==pause
         '  }  \n' +
-        '  else if(u_runMode == 2) { \n' +    
-        '    v_Color = vec4(1.0, 1.0, 1.0, 1.0); \n' +  // white: 2==step
-        '  } \n' +
         '  else { \n' +
-        '    v_Color = vec4(0.2, 1.0, 0.2, 1.0); \n' +  // green: >3==run
+        '    v_Color = a_Color;  \n' +
         '  } \n' +
         '} \n';
 
         this.FRAG_SRC = //---------------------- FRAGMENT SHADER source code 
         'precision mediump float;\n' +
         'varying vec4 v_Color; \n' +
+
         'void main() {\n' +
         '  float dist = distance(gl_PointCoord, vec2(0.5, 0.5)); \n' +
         '  if(dist < 0.5) { \n' + 
@@ -50,20 +55,19 @@ function VboFire() {
     this.a_AgeID;
     this.a_ColorID;
 
-    this.nParticles = 800;
+    this.nParticles = 1500;
 
-    this.fountainResp = new FountainRespawn(6, [0, 0, 0.5]);
+    this.fireResp = new FireRespawn(4, [0, 0, 0.5]);
 
-    this.partVec = new Fire();
-    this.forceList = [new Gravity(), new Drag()];
+    this.forceList = [new Gravity(.3), new Drag()];
     this.limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
                  new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
                  new AxisWall('z', 0, '+'), new AxisWall('z', 4, '-'),
-                 this.fountainResp];
+                 this.fireResp];
 
 
     this.partVec.init(this.nParticles, this.forceList, this.limitList);
-    this.partVec.setStatus(this.fountainResp);
+    this.partVec.setStatus(this.fireResp);
     this.partVec.setRndMasses(1, 1);
 
 
@@ -77,13 +81,13 @@ VboFire.prototype.init = function() {
     VboParticleSys.prototype.init.apply(this, arguments);
 
     this.a_AgeID = gl.getAttribLocation(gl.program, 'a_Age');
-    if(this.a_PositionID < 0) {
+    if(this.a_a_AgeID < 0) {
         console.log('Failed to get the storage location of a_Age');
         return -1;
     }
     
     this.a_ColorID = gl.getAttribLocation(gl.program, 'a_Color');
-    if(this.a_PositionID < 0) {
+    if(this.a_ColorID < 0) {
         console.log('Failed to get the storage location of a_Color');
         return -1;
     }

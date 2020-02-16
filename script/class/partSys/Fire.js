@@ -8,11 +8,10 @@ var Fire = function() {
 	this.PartAgeSingle = this.PartObjectSize;
 	this.PartObjectSize += 1;
 	this.ageScaler = 1;
-	this.ageLimit = 6;
 
-	this.PartColorLoc = 1;
-	this.PartColorDim = 3;
-	this.PartObjectSize += 3;
+	this.PartColorLoc = this.PartObjectSize;
+	this.PartColorDim = 4;
+	this.PartObjectSize += this.PartColorDim;
 
 }
 

@@ -4,12 +4,15 @@ function initBoxes() {
 
   gridBox = new VboGrid();
 
-  partBoxArray = [new VboFountain(), new VboMultiSpring()];
+  partBoxArray = [new VboFire(), new VboMultiSpring()];
+
+  // partBoxArray = [new VboFire(), null];
 
   gridBox.init();
 
   for (var i = 0; i < partBoxArray.length; i++) {
-    partBoxArray[i].init();
+    if (partBoxArray[i] != null)
+      partBoxArray[i].init();
   }
 
   defaultVec = partBoxArray[0].partVec;

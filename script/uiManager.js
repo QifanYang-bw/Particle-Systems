@@ -8,7 +8,6 @@ function RGBIntToFloat(intArray) {
 	return [intArray[0] / 255, intArray[1] / 255, intArray[2] / 255]
 }
 
-
 function RGBFloatToInt(floatArray) {
 	if (floatArray.length != 3) {
 		console.log('function RGBIntToFloat only support vec3!')
