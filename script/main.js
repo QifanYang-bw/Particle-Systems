@@ -44,9 +44,9 @@ var vpMatrix;
 
 var a_PositionID, u_runModeID, u_ballShiftID, u_MvpMatrixID;
 
-var partBox, gridBox;
-
+var gridBox, partBoxArray;
 var defaultVec;
+var solverFunc;
 
 function main() {
 
@@ -93,7 +93,11 @@ function main() {
   //			single-number and single-letter inputs that include SHIFT,CTRL,ALT.
 	// END Mouse & Keyboard Event-Handlers-----------------------------------
 
-  // ============================= PartSys Init ===================================
+  // ============================= GUI Init ===================================
+  
+  initGUI();
+
+  // ============================= VboBox Init ===================================
 
   initBoxes();
 
@@ -396,12 +400,12 @@ function draw() {
 	
   // ============================= PartSys Update ===================================
 
-  xposNow = partBox.partVec.s1[0];
-  yposNow = partBox.partVec.s1[1];
-  zposNow = partBox.partVec.s1[2];
-  xvelNow = partBox.partVec.s1[3];
-  yvelNow = partBox.partVec.s1[4];
-  zvelNow = partBox.partVec.s1[5];
+  xposNow = defaultVec.s1[0];
+  yposNow = defaultVec.s1[1];
+  zposNow = defaultVec.s1[2];
+  xvelNow = defaultVec.s1[3];
+  yvelNow = defaultVec.s1[4];
+  zvelNow = defaultVec.s1[5];
 
   displayMe();        // Display particle-system status on-screen.
 

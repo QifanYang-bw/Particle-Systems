@@ -1,5 +1,5 @@
 // Define all the adjustable ball-movement parameters, and
-var INIT_VEL = 0.15 * 60.0;    // initial velocity in meters/sec.
+var INIT_VEL =  0.15 * 60.0;    // initial velocity in meters/sec.
                         // adjust by ++Start, --Start buttons. Original value 
                         // was 0.15 meters per timestep; multiply by 60 to get
                         // meters per second.

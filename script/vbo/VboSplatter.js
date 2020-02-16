@@ -16,7 +16,7 @@ function VboSplatter() {
     this.partVec.setRndPositions(-1.8, 1.8, -1.8, 1.8, 0.2, 3.8);
     this.partVec.setRndMasses(1, 1);
 
-    this.partVec.sampleParticleInfo();
+    // this.partVec.sampleParticleInfo();
 
 }
 
