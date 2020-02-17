@@ -42,6 +42,7 @@ function initGUI() {
 		IterativeEuler: 3,
 		IterativeMidPoint: 4,
 		Verlet: 5,
+		VelocityVerlet: 6,
 	} );
 
 	// var f1 = gui.addFolder('Rendering');

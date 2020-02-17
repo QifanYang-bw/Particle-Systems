@@ -60,6 +60,7 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
 		this.s1[j + this.PartPosLoc + 3] = 1;
 		this.s2[j + this.PartPosLoc + 3] = 1;
+		this.s3[j + this.PartPosLoc + 3] = 1;
 	}
 
 	this.__initialized = true;
@@ -80,7 +81,7 @@ PartSys.prototype.renderFrame = function() {
     this.solver(this);
 
     this.doConstraint();
-    // this.render();
+
     this.swap();
 
 }

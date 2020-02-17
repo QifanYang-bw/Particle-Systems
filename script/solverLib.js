@@ -189,7 +189,78 @@ solverLib.IterativeMidPoint = function (obj) {
 }
 
 
+var VerletFirstFrame = true;
+
 solverLib.Verlet = function (obj) {
+	// Find next state (Midpoint - Iterative)
+
+	var t = g_timeStep * 0.001;
+
+	solverLib.dotFinder(obj, obj.s1, obj.s1dot);
+
+	if (VerletFirstFrame) {
+
+		var j = 0;
+		// Pos: s2 = s1 + s1dot * h + .5 * s1dotdot * h * h
+
+		for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+			for (var inc = 0; inc < obj.PartDim; inc++ ) {
+
+				obj.s2[j + obj.PartPosLoc + inc] =
+					obj.s1[j + obj.PartPosLoc + inc] +
+					obj.s1dot[j + obj.PartPosLoc + inc] * t +
+					obj.s1dot[j + obj.PartVelLoc + inc] * t * t * .5;
+
+				obj.s2[j + obj.PartVelLoc + inc] = obj.s1dot[j + obj.PartPosLoc + inc];
+
+			}
+			// if (obj.PartPosDim == 4) {
+			// 	obj.s2[j + obj.PartPosLoc + 3] = 1;
+			// }
+		}
+		VerletFirstFrame = false;
+
+	}
+	else {
+		var j = 0;
+
+		// Pos: s2 = 2s1 - s3 + s1dotdot * h * h
+
+		for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+
+			for (var inc = 0; inc < obj.PartDim; inc++ ) {
+
+				a = obj.s1[obj.PartFLoc + j + inc] / obj.s1[obj.PartMLocSingle + j];
+				if (obj.enableMassChange && Math.abs(obj.s1dot[obj.PartMLocSingle + j] - 0) > 1e-6) {
+					a += obj.s1dot[obj.PartMLocSingle + j] * obj.s1[obj.PartVelLoc + j + inc]
+				}
+
+				obj.s2[j + obj.PartPosLoc + inc] =
+					obj.s1[j + obj.PartPosLoc + inc] * 2 +
+				   	-obj.s3[j + obj.PartPosLoc + inc] +
+					a * t * t;
+
+				obj.s2[j + obj.PartVelLoc + inc] = 
+					(obj.s2[j + obj.PartPosLoc + inc] - obj.s1[j + obj.PartPosLoc + inc]) / t;
+
+			}
+
+		}
+	}
+
+	// Patch up Everything else if there is
+	var j = 0;
+	for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+		for (var inc = obj.PartPosVelNext; inc < obj.PartObjectSize; inc++) {
+			obj.s2[j + inc] = obj.s1[j + inc] + obj.s1dot[j + inc] * t;
+		}
+	}
+
+	obj.swap3();
+
+}
+
+solverLib.VelocityVerlet = function (obj) {
 	// Find next state (Midpoint - Iterative)
 
 	solverLib.dotFinder(obj, obj.s1, obj.s1dot);

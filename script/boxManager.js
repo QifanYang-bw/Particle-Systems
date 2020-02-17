@@ -35,6 +35,8 @@ function renderBoxes(vpMatrix) {
     solverFunc = solverLib.IterativeMidPoint;
   } else if (settings.Solver == 5) {
     solverFunc = solverLib.Verlet;
+  } else if (settings.Solver == 6) {
+    solverFunc = solverLib.VelocityVerlet;
   }
 
   if (settings.ForceField) {
