@@ -31,7 +31,7 @@ TCentripetal.prototype.__applyForce = function(p) {
 		for (var inc = 0; inc < p.PartDim; inc++) {
 			diffVec[inc] /= x + 1e-4;
 
-			p.s1[j + p.PartFLoc + inc] += fSize * 10 * diffVec[inc];
+			p.s1[j + p.PartFLoc + inc] += fSize * 8 * diffVec[inc];
 		}
 	}
 

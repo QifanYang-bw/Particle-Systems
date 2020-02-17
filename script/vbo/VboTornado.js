@@ -50,8 +50,8 @@ function VboTornado() {
 
     this.forceList = [new TCentripetal(), new RandomBehaviour(4)];
 
-    this.limitList = [new AxisDampenWall('x', -8, '+'), new AxisDampenWall('x',8, '-'),
-                 new AxisDampenWall('y', -8, '+'), new AxisDampenWall('y', 8, '-'),
+    this.limitList = [new AxisDampenWall('x', -10, '+'), new AxisDampenWall('x', 10, '-'),
+                 new AxisDampenWall('y', -10, '+'), new AxisDampenWall('y', 10, '-'),
                  new AxisDampenWall('z', 0, '+'), new AxisDampenWall('z', 6, '-')];
 
 
