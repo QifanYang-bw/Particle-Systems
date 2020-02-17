@@ -31,7 +31,7 @@ function initGUI() {
 
 	var f1 = gui.addFolder('Particle Systems');
 	f1.add(settings, 'ForceField');
-	f1.add(settings, 'Flocks');
+	f1.add(settings, 'Boid');
 	f1.add(settings, 'Flame');
 	f1.add(settings, 'Springs');
 
@@ -76,9 +76,9 @@ function initGUI() {
 var SettingsManager = function() {
 
 	this.ForceField = false;
-	this.Flocks = false;
+	this.Boid = true;
 	this.Flame = false;
-	this.Springs = true;
+	this.Springs = false;
 
 	this.Solver = 1;
 };

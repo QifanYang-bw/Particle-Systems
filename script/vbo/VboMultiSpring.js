@@ -38,9 +38,9 @@ function VboMultiSpring() {
     this.springForce.setAllForcesInPlace([0, 1, 2, 3, 4, 5, 6, 7], 100); //iArray, k
     this.springForce.setAllForcesInPlace([8, 9, 10, 11, 12, 13, 14, 15], 100); //iArray, k
 
-    this.springForce.setForceWithLength(7, 8, 10, .6); //iArray, k
+    this.springForce.setForceWithLength(7, 8, 80, .6); //iArray, k
 
-    console.log(this.springForce.springList);
+    // console.log(this.springForce.springList);
 
 }   
 

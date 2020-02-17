@@ -28,8 +28,7 @@ function PartSys() {
 
 	this.partCount = 0;
 
-	// this.solverFunction = solverFunc;
-	// console.log(solverFunc);
+	this.enableMassChange = false;
 
 }
 
@@ -211,7 +210,7 @@ PartSys.prototype.dotFinder = function() {
 			// F = ma, a = F/m
 			this.s1dot[this.PartVelLoc + tinc] = this.s1[this.PartFLoc + tinc] / this.s1[this.PartMLocSingle + j];
 
-			if (Math.abs(this.s1dot[this.PartMLocSingle + j] - 0) > 1e-6) {
+			if (this.enableMassChange && Math.abs(this.s1dot[this.PartMLocSingle + j] - 0) > 1e-6) {
 				this.s1dot[this.PartVelLoc + tinc] += this.s1dot[this.PartMLocSingle + j] * this.s1[this.PartVelLoc + tinc]
 			}
 
