@@ -35,7 +35,7 @@ function initGUI() {
 	f1.add(settings, 'Flame');
 	f1.add(settings, 'Springs');
 
-	var fSolver = gui.add(settings, 'Solver', { Explicit: 0, Implicit: 1 } );
+	var fSolver = gui.add(settings, 'Solver', { Explicit: 0, Implicit: 1, MidPoint: 2 } );
 
 	// var f1 = gui.addFolder('Rendering');
 	// f1.add(settings, 'vertexShader', { Phong: 0, Gouraud: 1 } );
@@ -75,10 +75,10 @@ function initGUI() {
 
 var SettingsManager = function() {
 
-	this.ForceField = true;
+	this.ForceField = false;
 	this.Boid = false;
 	this.Flame = false;
-	this.Springs = false;
+	this.Springs = true;
 
 	this.Solver = 1;
 };

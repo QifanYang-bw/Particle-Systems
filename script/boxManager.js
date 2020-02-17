@@ -27,6 +27,8 @@ function renderBoxes(vpMatrix) {
     solverFunc = solverLib.Explicit;
   } else if (settings.Solver == 1) {
     solverFunc = solverLib.Implicit;
+  } else if (settings.Solver == 2) {
+    solverFunc = solverLib.MidPoint;
   }
 
   if (settings.ForceField) {

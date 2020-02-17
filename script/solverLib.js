@@ -1,7 +1,36 @@
 function solverLib() {}
 
+solverLib.dotFinder = function(obj, s1, s1dot) {
+
+	// Find s1dot by applying Newton’s laws to Ftot
+
+	var j = 0;
+
+	for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+
+		for (var inc = 0; inc < obj.PartDim; inc++) {
+			var tinc = j + inc;
+
+			s1dot[obj.PartPosLoc + tinc] = s1[obj.PartVelLoc + tinc];
+
+			// Assuming constant Mass
+			// F = ma, a = F/m
+			s1dot[obj.PartVelLoc + tinc] = s1[obj.PartFLoc + tinc] / s1[obj.PartMLocSingle + j];
+
+			if (obj.enableMassChange && Math.abs(s1dot[obj.PartMLocSingle + j] - 0) > 1e-6) {
+				s1dot[obj.PartVelLoc + tinc] += s1dot[obj.PartMLocSingle + j] * s1[obj.PartVelLoc + tinc]
+			}
+
+
+		}
+	}
+
+}
+
 solverLib.Explicit = function (obj) {
 	// Find next state (Euler/Explicit: s2 = s1+ h*s1dot)
+
+	solverLib.dotFinder(obj, obj.s1, obj.s1dot);
 
 	var t = g_timeStep * 0.001;
 
@@ -13,6 +42,8 @@ solverLib.Explicit = function (obj) {
 
 solverLib.Implicit = function (obj) {
 	// Find next state (implicit: s2 = s1+ h*s2dot)
+
+	solverLib.dotFinder(obj, obj.s1, obj.s1dot);
 
 	var t = g_timeStep * 0.001;
 	var j = 0;
@@ -32,4 +63,25 @@ solverLib.Implicit = function (obj) {
 		}
 	}
 
+}
+
+
+solverLib.MidPoint = function (obj) {
+	// Find next state (Midpoint/Runge-Kutta)
+
+	solverLib.dotFinder(obj, obj.s1, obj.s1dot);
+
+	var t = g_timeStep * 0.001;
+
+	// sM = s1 + (h/2)*s1dot
+
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] = obj.s1[i] + obj.s1dot[i] * t / 2;
+	}
+
+	solverLib.dotFinder(obj, obj.s2, obj.s1dot);
+
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] = obj.s1[i] + obj.s1dot[i] * t;
+	}
 }
