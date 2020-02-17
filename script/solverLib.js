@@ -76,12 +76,114 @@ solverLib.MidPoint = function (obj) {
 	// sM = s1 + (h/2)*s1dot
 
 	for (var i = 0; i < obj.totalLength; i++) {
-		obj.s2[i] = obj.s1[i] + obj.s1dot[i] * t / 2;
+		obj.s2[i] = obj.s1[i] + obj.s1dot[i] * t * .5;
 	}
+
+	obj.swap();
+	obj.applyForces();
+	obj.swap();
+
+	solverLib.dotFinder(obj, obj.s2, obj.s2dot);
+
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] = obj.s1[i] + obj.s2dot[i] * t;
+	}
+}
+
+
+solverLib.IterativeEuler = function (obj) {
+	// Find next state (Euler - Iterative)
+
+	solverLib.dotFinder(obj, obj.s1, obj.s1dot);
+
+	var t = g_timeStep * 0.001;
+
+	// sM = s1 + h*s1dot
+
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] = obj.s1[i] + obj.s1dot[i] * t;
+	}
+
+	obj.swap();
+	obj.applyForces();
+	obj.swap();
+
+	solverLib.dotFinder(obj, obj.s2, obj.s2dot);
+
+	// s3 = s2 - h*s2dot
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s3[i] = obj.s2[i] - obj.s2dot[i] * t;
+	}
+
+	// sErr = s1 - s3 .....<- Why there is an h in the Position formula?
+	// s2new = s2 + 0.5 * sErr
+
+	var j = 0;
+
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] += .5 * (obj.s1[i] - obj.s3[i]);
+	}
+
+}
+
+
+solverLib.IterativeMidPoint = function (obj) {
+	// Find next state (Midpoint - Iterative)
+
+	solverLib.dotFinder(obj, obj.s1, obj.s1dot);
+
+	var t = g_timeStep * 0.001;
+
+	// ========== Midpoint ==========
+	// Midpoint for s1
+
+	// sM = s1 + (h/2)*s1dot
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] = obj.s1[i] + obj.s1dot[i] * t * .5;
+	}
+
+	obj.swap();
+	obj.applyForces();
+	obj.swap();
 
 	solverLib.dotFinder(obj, obj.s2, obj.s1dot);
 
 	for (var i = 0; i < obj.totalLength; i++) {
 		obj.s2[i] = obj.s1[i] + obj.s1dot[i] * t;
 	}
+
+	// Midpoint for s2
+
+	obj.swap();
+	obj.applyForces();
+	obj.swap();
+	
+	// sM = s1 + (h/2)*s1dot
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s3[i] = obj.s2[i] + obj.s2dot[i] * t * .5;
+	}
+
+	obj.swap3();
+	obj.applyForces();
+	obj.swap3();
+
+	solverLib.dotFinder(obj, obj.s3, obj.s2dot);
+
+	// ========== Midpoint End ==========
+
+
+	// s3 = s2 - h*s2dot
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s3[i] = obj.s2[i] - obj.s2dot[i] * t;
+	}
+
+	// sErr = s1 - s3 .....<- Why there is an h in the Position formula?
+	// s2new = s2 + 0.5 * sErr
+
+	var j = 0;
+
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] += .5 * (obj.s1[i] - obj.s3[i]);
+	}
+
 }

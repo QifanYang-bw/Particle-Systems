@@ -35,7 +35,13 @@ function initGUI() {
 	f1.add(settings, 'Flame');
 	f1.add(settings, 'Springs');
 
-	var fSolver = gui.add(settings, 'Solver', { Explicit: 0, Implicit: 1, MidPoint: 2 } );
+	var fSolver = gui.add(settings, 'Solver', {
+		Explicit: 0,
+		Implicit: 1,
+		MidPoint: 2,
+		IterativeEuler: 3,
+		IterativeMidPoint: 4
+	} );
 
 	// var f1 = gui.addFolder('Rendering');
 	// f1.add(settings, 'vertexShader', { Phong: 0, Gouraud: 1 } );

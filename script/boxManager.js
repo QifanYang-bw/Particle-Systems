@@ -29,6 +29,10 @@ function renderBoxes(vpMatrix) {
     solverFunc = solverLib.Implicit;
   } else if (settings.Solver == 2) {
     solverFunc = solverLib.MidPoint;
+  } else if (settings.Solver == 3) {
+    solverFunc = solverLib.IterativeEuler;
+  } else if (settings.Solver == 4) {
+    solverFunc = solverLib.IterativeMidPoint;
   }
 
   if (settings.ForceField) {

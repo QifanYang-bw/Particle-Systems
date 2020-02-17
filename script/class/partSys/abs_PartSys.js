@@ -48,6 +48,9 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 	this.s1 = new Float32Array(this.totalLength);
 	this.s1dot = new Float32Array(this.totalLength);
 	this.s2 = new Float32Array(this.totalLength);
+	this.s2dot = new Float32Array(this.totalLength);
+	this.s3 = new Float32Array(this.totalLength);
+	// this.sM = new Float32Array(this.totalLength);
 
 	this.forceList = arguments[1];
 	this.limitList = arguments[2];
@@ -73,8 +76,9 @@ PartSys.prototype.renderFrame = function() {
 	}
 
     this.applyForces();
-    this.dotFinder();
+
     this.solver(this);
+
     this.doConstraint();
     // this.render();
     this.swap();
@@ -202,33 +206,6 @@ PartSys.prototype.applyForces = function() {
 	// Calculates s1(xftot, yftot, zftot)
 }
 
-PartSys.prototype.dotFinder = function() {
-
-	// Find s1dot by applying Newton’s laws to Ftot
-
-	var j = 0;
-
-	for (var i = 0; i < this.partCount; i++, j+=this.PartObjectSize) {
-
-		for (var inc = 0; inc < this.PartDim; inc++) {
-			var tinc = j + inc;
-
-			this.s1dot[this.PartPosLoc + tinc] = this.s1[this.PartVelLoc + tinc];
-
-			// Assuming constant Mass
-			// F = ma, a = F/m
-			this.s1dot[this.PartVelLoc + tinc] = this.s1[this.PartFLoc + tinc] / this.s1[this.PartMLocSingle + j];
-
-			if (this.enableMassChange && Math.abs(this.s1dot[this.PartMLocSingle + j] - 0) > 1e-6) {
-				this.s1dot[this.PartVelLoc + tinc] += this.s1dot[this.PartMLocSingle + j] * this.s1[this.PartVelLoc + tinc]
-			}
-
-
-		}
-	}
-
-	// Calculates this.s1dot
-}
 
 PartSys.prototype.solver = function() {
 
@@ -262,6 +239,18 @@ PartSys.prototype.swap = function() {
 	this.s2 = temp;
 
 }
+
+
+PartSys.prototype.swap3 = function() {
+
+	// Transfer contents of state vector s1 and s3
+
+	var temp = this.s1;
+	this.s1 = this.s3;
+	this.s3 = temp;
+
+}
+
 
 PartSys.prototype.sampleParticleInfo = function(id = -1) {
 
