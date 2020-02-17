@@ -187,3 +187,51 @@ solverLib.IterativeMidPoint = function (obj) {
 	}
 
 }
+
+
+solverLib.Verlet = function (obj) {
+	// Find next state (Midpoint - Iterative)
+
+	solverLib.dotFinder(obj, obj.s1, obj.s1dot);
+
+	var t = g_timeStep * 0.001;
+
+	var j = 0;
+	// Pos: s2 = s1 + s1dot * h + .5 * s1dotdot * h * h
+
+	for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+		for (var inc = 0; inc < obj.PartDim; inc++ ) {
+
+			obj.s2[j + obj.PartPosLoc + inc] =
+				obj.s1[j + obj.PartPosLoc + inc] +
+				obj.s1dot[j + obj.PartPosLoc + inc] * t +
+				obj.s1dot[j + obj.PartVelLoc + inc] * t * t * .5;
+
+		}
+	}
+
+	obj.swap();
+	obj.applyForces();
+	obj.swap();
+
+	solverLib.dotFinder(obj, obj.s2, obj.s2dot);
+
+	var j = 0;
+	// Vel: s2 = s1 + .5 * (s1 + s2)
+
+	for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+		for (var inc = 0; inc < obj.PartDim; inc++ ) {
+			obj.s2[j + obj.PartVelLoc + inc] =
+				obj.s1dot[j + obj.PartPosLoc + inc] +
+				(obj.s1dot[j + obj.PartVelLoc + inc] + obj.s2dot[j + obj.PartVelLoc + inc]) * t * .5
+		}
+	}
+
+	// Patch up Everything else if there is
+	var j = 0;
+	for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+		for (var inc = obj.PartPosVelNext; inc < obj.PartObjectSize; inc++) {
+			obj.s2[j + inc] = obj.s1[j + inc] + obj.s1dot[j + inc] * t;
+		}
+	}
+}

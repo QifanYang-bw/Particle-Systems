@@ -33,6 +33,8 @@ function renderBoxes(vpMatrix) {
     solverFunc = solverLib.IterativeEuler;
   } else if (settings.Solver == 4) {
     solverFunc = solverLib.IterativeMidPoint;
+  } else if (settings.Solver == 5) {
+    solverFunc = solverLib.Verlet;
   }
 
   if (settings.ForceField) {

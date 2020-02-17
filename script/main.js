@@ -103,7 +103,7 @@ function main() {
 
   // ============================= Canvas Settings ===================================
 	
-  gl.clearColor(0.08, 0.08, 0.07, 1);    // RGBA color for clearing WebGL framebuffer
+  gl.clearColor(0.1, 0.1, 0.09, 1);    // RGBA color for clearing WebGL framebuffer
   // gl.clear(gl.COLOR_BUFFER_BIT);    // clear it once to set that color as bkgnd.
 
   gl.enable(gl.DEPTH_TEST);

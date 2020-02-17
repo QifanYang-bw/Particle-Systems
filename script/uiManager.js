@@ -40,7 +40,8 @@ function initGUI() {
 		Implicit: 1,
 		MidPoint: 2,
 		IterativeEuler: 3,
-		IterativeMidPoint: 4
+		IterativeMidPoint: 4,
+		Verlet: 5,
 	} );
 
 	// var f1 = gui.addFolder('Rendering');
