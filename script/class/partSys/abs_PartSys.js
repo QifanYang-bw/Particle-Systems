@@ -121,6 +121,15 @@ PartSys.prototype.setPosition = function(serial, xpos, ypos, zpos) {
 }
 
 
+PartSys.prototype.setRndPosition = function(i, xposMin, xposMax, yposMin, yposMax, zposMin, zposMax) {
+
+	j = this.PartObjectSize * serial;
+	this.s1[j + this.PartPosLoc + 0] = randrange(xposMin, xposMax);
+	this.s1[j + this.PartPosLoc + 1] = randrange(yposMin, yposMax);
+	this.s1[j + this.PartPosLoc + 2] = randrange(zposMin, zposMax);
+
+}
+
 PartSys.prototype.setMass = function(serial, mass) {
 
 	j = this.PartObjectSize * serial;

@@ -1,10 +1,10 @@
 // ==================== RandomBehaviour CForcer ====================
-var RandomBehaviour = function(g = 9.832) { 
+var RandomBehaviour = function(coeff = 2) { 
 
 	CForcer.call(this);
 
 	// RandomBehaviour only
-	this.coeff = 2;
+	this.coeff = coeff;
 
 }
 

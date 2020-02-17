@@ -75,8 +75,8 @@ function initGUI() {
 
 var SettingsManager = function() {
 
-	this.ForceField = false;
-	this.Boid = true;
+	this.ForceField = true;
+	this.Boid = false;
 	this.Flame = false;
 	this.Springs = false;
 

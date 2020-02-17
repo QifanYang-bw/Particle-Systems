@@ -4,7 +4,10 @@ function initBoxes() {
 
   gridBox = new VboGrid();
 
-  partBoxArray = [new VboBoid(), new VboFire(), new VboMultiSpring()];
+  partBoxArray = [new VboTornado(),
+                  new VboBoid(),
+                  new VboFire(),
+                  new VboMultiSpring()];
 
   // partBoxArray = [new VboFire(), null];
 
@@ -26,26 +29,59 @@ function renderBoxes(vpMatrix) {
     solverFunc = solverLib.Implicit;
   }
 
+  if (settings.ForceField) {
+    drawBox(0, vpMatrix);
+  }
   if (settings.Boid) {
-    partBoxArray[0].switchToMe();
-    partBoxArray[0].adjust(vpMatrix);
-    partBoxArray[0].draw();
+    drawBox(1, vpMatrix);
   }
-
   if (settings.Flame) {
-    partBoxArray[1].switchToMe();
-    partBoxArray[1].adjust(vpMatrix);
-    partBoxArray[1].draw();
+    drawBox(2, vpMatrix);
   }
-
   if (settings.Springs) {
-    partBoxArray[2].switchToMe();
-    partBoxArray[2].adjust(vpMatrix);
-    partBoxArray[2].draw();
+    drawBox(3, vpMatrix);
   }
 
   gridBox.switchToMe();
   gridBox.adjust(vpMatrix);
   gridBox.draw();
 
+}
+
+function drawBox(id, vpMatrix) {
+    partBoxArray[id].switchToMe();
+    partBoxArray[id].adjust(vpMatrix);
+    partBoxArray[id].draw();
+}
+
+function addRandVel() {
+
+  if (settings.ForceField) {
+    partBoxArray[0].partVec.addRandVelocityToAll(
+        0.2 * INIT_VEL, INIT_VEL, 
+        0.2 * INIT_VEL, INIT_VEL,
+        0.2 * INIT_VEL, INIT_VEL
+    );
+  }
+  if (settings.Boid) {
+    partBoxArray[1].partVec.addRandVelocityToAll(
+        0.2 * INIT_VEL, INIT_VEL, 
+        0.2 * INIT_VEL, INIT_VEL,
+        0.2 * INIT_VEL, INIT_VEL
+    );
+  }
+  if (settings.Flame) {
+    partBoxArray[2].partVec.addRandVelocityToAll(
+        0.2 * INIT_VEL, INIT_VEL, 
+        0.2 * INIT_VEL, INIT_VEL,
+        0.2 * INIT_VEL, INIT_VEL
+    );
+  }
+  if (settings.Springs) {
+    partBoxArray[3].partVec.addRandVelocityToAll(
+        0.2 * INIT_VEL, INIT_VEL, 
+        0.2 * INIT_VEL, INIT_VEL,
+        0.2 * INIT_VEL, INIT_VEL
+    );
+  }
 }

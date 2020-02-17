@@ -241,11 +241,7 @@ function myKeyPress(kev) {
 			// if(xvelNow > 0.0) xvelNow += INIT_VEL; else xvelNow -= INIT_VEL;
 			// if(yvelNow > 0.0) yvelNow += 0.9*INIT_VEL; else yvelNow -= 0.9*INIT_VEL;
 
-  		defaultVec.addRandVelocityToAll(
-        0.2 * INIT_VEL, INIT_VEL, 
-        0.2 * INIT_VEL, INIT_VEL,
-        0.2 * INIT_VEL, INIT_VEL
-      );
+  		addRandVel();
 
 			break;	
 		// case 's':

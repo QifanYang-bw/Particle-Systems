@@ -1,4 +1,5 @@
 //=============================================================================
+
 function VboBoid() {
 
     VboParticleSys.call(this);
@@ -8,7 +9,6 @@ function VboBoid() {
     this.partVec = new PartSys();
 
     this.forceList = [new BoidBehaviour(), new RandomBehaviour(), new Drag(0.99)];
-    // this.forceList = [new BoidBehaviour(), new RandomBehaviour()];
 
     this.limitList = [new AxisWall('x', -4, '+'), new AxisWall('x', 4, '-'),
                  new AxisWall('y', -4, '+'), new AxisWall('y', 4, '-'),
