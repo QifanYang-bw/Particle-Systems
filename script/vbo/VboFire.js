@@ -57,7 +57,7 @@ function VboFire() {
     // this.a_AgeID;
     this.a_ColorID;
 
-    this.nParticles = 10000;
+    this.nParticles = 5000;
     this.ageLimit = 1.5;
 
     this.fireResp = new FireRespawn(this.ageLimit, [0, 0, 0.5]);

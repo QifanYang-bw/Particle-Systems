@@ -67,8 +67,8 @@ function initGUI() {
 
 var SettingsManager = function() {
 
-	this.ForceField = true;
-	this.Boid = false;
+	this.ForceField = false;
+	this.Boid = true;
 	this.Flame = false;
 	this.Springs = false;
 
@@ -80,7 +80,7 @@ var SettingsManager = function() {
 	this.sphereZ = 2.0;
 	this.sphereRad = 1.2;
 
-	this.cylinderEnabled = true;
+	this.cylinderEnabled = false;
 	this.cylinderX = 0.0;
 	this.cylinderY = 0.0;
 	this.cylinderZ = 2.0;

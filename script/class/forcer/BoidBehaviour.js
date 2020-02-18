@@ -1,18 +1,18 @@
 // ==================== BoidBehaviour CForcer ====================
-var BoidBehaviour = function() { 
+var BoidBehaviour = function(effectDist = 0.6, coeff = 30) { 
 	CForcer.call(this);
 
-	this.effectDist = 0.8;
+	this.effectDist = effectDist;
 
 	this.p;
-	this.coeff = 20;
+	this.coeff = coeff;
 }
 
 BoidBehaviour.prototype = Object.create(CForcer.prototype);
 BoidBehaviour.prototype.constructor = BoidBehaviour;
 
 BoidBehaviour.prototype.__swapElement = function(i1, i2) {
-
+ 
 	var temp;
 	var loc1 = this.p.PartObjectSize * i1, loc2 = this.p.PartObjectSize * i2;
 
@@ -135,8 +135,8 @@ BoidBehaviour.prototype.__applyForce = function(p) {
 		var dCoh = this._distonVec(fCohList) + 1e-4;
 
 		for (var inc = 0; inc < p.PartDim; inc++) {
-			p.s1[loci + p.PartFLoc] += (
-				fSepList[inc] / dSep * 3 + 
+			p.s1[loci + p.PartFLoc + inc] += (
+				fSepList[inc] / dSep + 
 				fAlignList[inc] / dAlign + 
 				fCohList[inc] / dCoh
 			) * 20;

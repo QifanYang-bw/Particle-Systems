@@ -79,7 +79,7 @@ PartSys.prototype.renderFrame = function() {
 
     this.applyForces();
 
-    this.solver(this);
+    this.solver();
 
     this.doConstraint();
 
