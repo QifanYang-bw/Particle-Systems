@@ -12,8 +12,8 @@ var FireRespawn = function(
 	this.spawnAreaMin = [-.1, -.1, -.25];
 	this.spawnAreaMax = [.1, .1, .25];
 
-	this.spawnVelMin = [-.5, -.5, .5];
-	this.spawnVelMax = [.5, .5, 1.2];
+	this.spawnVelMin = [-.5, -.5, .8];
+	this.spawnVelMax = [.5, .5, 1.6];
 
 	this.spawnColor = RGBIntToFloat([255, 221, 0]);
 	this.spawnColor.push(1.0);
