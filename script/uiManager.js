@@ -62,7 +62,17 @@ function initGUI() {
 	fCyl.add(settings, 'cylinderRad');
 	fCyl.add(settings, 'cylinderHeight');
 
+
+	var fForc = gui.addFolder('Forces');
+	fForc.add(settings, 'sphForceEnabled');
+	fForc.add(settings, 'sphForceX');
+	fForc.add(settings, 'sphForceY');
+	fForc.add(settings, 'sphForceZ');
+	fForc.add(settings, 'sphForceMass');
+
 	f1.open();
+	fCons.open();
+	fForc.open();
 }
 
 var SettingsManager = function() {
@@ -87,4 +97,9 @@ var SettingsManager = function() {
 	this.cylinderRad = 2.0;
 	this.cylinderHeight = 4.0;
 
+	this.sphForceEnabled = false;
+	this.sphForceX = 0.0;
+	this.sphForceY = 0.0;
+	this.sphForceZ = 2.0;
+	this.sphForceMass = 1.2;
 };

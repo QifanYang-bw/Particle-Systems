@@ -21,11 +21,14 @@ function initBoxes() {
 
   globalLimitList = [new SphereObject(), new CylinderObject()];
 
+  globalForceList = [new SphereField()];
+
 }
 
 function renderBoxes(vpMatrix) {
 
   setGlobalSolver();
+  setGlobalForces();
   setGlobalLimits();
 
   if (settings.ForceField) {
@@ -50,6 +53,10 @@ function renderBoxes(vpMatrix) {
 function setGlobalLimits() {
   globalLimitList[0].enabled = settings.sphereEnabled;
   globalLimitList[1].enabled = settings.cylinderEnabled;
+}
+
+function setGlobalForces() {
+  globalForceList[0].enabled = settings.sphForceEnabled;
 }
 
 function drawBox(id, vpMatrix) {

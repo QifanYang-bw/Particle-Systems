@@ -1,4 +1,4 @@
-var globalLimitList;
+var globalLimitList, globalForceList;
 
 function randrange(min, max) {
   return Math.random() * (max - min) + min;
@@ -204,7 +204,10 @@ PartSys.prototype.applyForces = function() {
 		this.forceList[i].applyForce(this);
 	}
 
-	// Calculates s1(xftot, yftot, zftot)
+	for (var i = 0; i < globalForceList.length; i++) {
+		globalForceList[i].applyForce(this);
+	}
+	
 }
 
 
