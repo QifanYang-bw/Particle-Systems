@@ -118,5 +118,7 @@ function setGlobalSolver() {
     solverFunc = solverLib.Verlet;
   } else if (settings.Solver == 6) {
     solverFunc = solverLib.VelocityVerlet;
+  } else if (settings.Solver == 7) {
+    solverFunc = solverLib.Heun;
   }
 }

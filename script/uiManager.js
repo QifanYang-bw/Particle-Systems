@@ -37,12 +37,13 @@ function initGUI() {
 
 	var fSolver = gui.add(settings, 'Solver', {
 		Explicit: 0,
-		Implicit: 1,
+		SymplecticEuler: 1,
 		MidPoint: 2,
 		IterativeEuler: 3,
 		IterativeMidPoint: 4,
 		Verlet: 5,
 		VelocityVerlet: 6,
+		HeunsMethod: 7,
 	} );
 
 	var fCons = gui.addFolder('Constraints');

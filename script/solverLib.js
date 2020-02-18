@@ -97,6 +97,31 @@ solverLib.MidPoint = function (obj) {
 	}
 }
 
+solverLib.Heun = function (obj) {
+	// Find next state (Euler - Iterative)
+
+	solverLib.dotFinder(obj, obj.s1, obj.s1dot);
+
+	var t = g_timeStep * 0.001;
+
+	// s2hat = s1 + h*s1dot
+
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] = obj.s1[i] + obj.s1dot[i] * t;
+	}
+
+	obj.swap();
+	obj.applyForces();
+	obj.swap();
+
+	solverLib.dotFinder(obj, obj.s2, obj.s2dot);
+
+	// s2 = s1 + h/2 * (s1dot + s2hatdot)
+	for (var i = 0; i < obj.totalLength; i++) {
+		obj.s2[i] = obj.s1[i] + .5 * t * (obj.s2dot[i] + obj.s1dot[i]);
+	}
+
+}
 
 solverLib.IterativeEuler = function (obj) {
 	// Find next state (Euler - Iterative)
