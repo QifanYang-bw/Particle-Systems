@@ -88,6 +88,13 @@ solverLib.MidPoint = function (obj) {
 	for (var i = 0; i < obj.totalLength; i++) {
 		obj.s2[i] = obj.s1[i] + obj.s2dot[i] * t;
 	}
+
+	var j = 0;
+	for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+		for (var inc = obj.PartPosVelNext; inc < obj.PartObjectSize; inc++) {
+			obj.s2[j + inc] = obj.s1[j + inc] + obj.s1dot[j + inc] * t;
+		}
+	}
 }
 
 
@@ -184,6 +191,13 @@ solverLib.IterativeMidPoint = function (obj) {
 
 	for (var i = 0; i < obj.totalLength; i++) {
 		obj.s2[i] += .5 * (obj.s1[i] - obj.s3[i]);
+	}
+	
+	var j = 0;
+	for (var i = 0; i < obj.partCount; i++, j+=obj.PartObjectSize) {
+		for (var inc = obj.PartPosVelNext; inc < obj.PartObjectSize; inc++) {
+			obj.s2[j + inc] = obj.s1[j + inc] + obj.s1dot[j + inc] * t;
+		}
 	}
 
 }

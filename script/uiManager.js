@@ -45,60 +45,46 @@ function initGUI() {
 		VelocityVerlet: 6,
 	} );
 
-	// var f1 = gui.addFolder('Rendering');
-	// f1.add(settings, 'vertexShader', { Phong: 0, Gouraud: 1 } );
-	// f1.add(settings, 'fragmentShader', { Phong: 0, Blinn_Phong: 1 } );
+	var fCons = gui.addFolder('Constraints');
 
+	var fSph = fCons.addFolder('Sphere');
+	fSph.add(settings, 'sphereEnabled');
+	fSph.add(settings, 'sphereX');
+	fSph.add(settings, 'sphereY');
+	fSph.add(settings, 'sphereZ');
+	fSph.add(settings, 'sphereRad');
 
-	// var fLamps = [];
-
-	// fLamps[i] = gui.addFolder('HeadLight');
-
-	// var thisLight = settings.lightSource[0];
-
-	// fLamps[i].add(thisLight, 'isLit');
-	// fLamps[i].addColor(thisLight, 'ambient');
-	// fLamps[i].addColor(thisLight, 'diffusal');
-	// fLamps[i].addColor(thisLight, 'specular');
-
-	// for (var i = 1; i < lightSourceCount; i++) {
-
-	// 	fLamps[i] = gui.addFolder('Light #' + i);
-
-	// 	thisLight = settings.lightSource[i];
-
-	// 	fLamps[i].add(thisLight, 'isLit');
-	// 	fLamps[i].add(thisLight, 'x');
-	// 	fLamps[i].add(thisLight, 'y');
-	// 	fLamps[i].add(thisLight, 'z');
-
-	// 	fLamps[i].addColor(thisLight, 'ambient');
-	// 	fLamps[i].addColor(thisLight, 'diffusal');
-	// 	fLamps[i].addColor(thisLight, 'specular');
-
-	// }
+	var fCyl = fCons.addFolder('Cylinder');
+	fCyl.add(settings, 'cylinderEnabled');
+	fCyl.add(settings, 'cylinderX');
+	fCyl.add(settings, 'cylinderY');
+	fCyl.add(settings, 'cylinderZ');
+	fCyl.add(settings, 'cylinderRad');
+	fCyl.add(settings, 'cylinderHeight');
 
 	f1.open();
 }
 
 var SettingsManager = function() {
 
-	this.ForceField = false;
+	this.ForceField = true;
 	this.Boid = false;
 	this.Flame = false;
-	this.Springs = true;
+	this.Springs = false;
 
 	this.Solver = 1;
+
+	this.sphereEnabled = true;
+	this.sphereX = 0.0;
+	this.sphereY = 0.0;
+	this.sphereZ = 2.0;
+	this.sphereRad = 1.2;
+
+	this.cylinderEnabled = false;
+	this.cylinderX = 0.0;
+	this.cylinderY = 0.0;
+	this.cylinderZ = 2.0;
+	this.cylinderRad = 2.0;
+	this.cylinderHeight = 3.0;
+
 };
-
-// SettingsManager.prototype.apply = function() {
-
-// 	if (this.Flame) {
-// 		initBoxes(VboSplatter);
-// 	} else if (this.Springs) {
-// 		initBoxes(VboMultiSpring);
-// 	} else {
-// 		initBoxes(null);
-// 	}
-
-// }

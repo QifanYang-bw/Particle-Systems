@@ -19,25 +19,14 @@ function initBoxes() {
 
   defaultVec = partBoxArray[0].partVec;
 
+  globalLimitList = [new SphereObject()];
+
 }
 
 function renderBoxes(vpMatrix) {
 
-  if (settings.Solver == 0) {
-    solverFunc = solverLib.Explicit;
-  } else if (settings.Solver == 1) {
-    solverFunc = solverLib.Implicit;
-  } else if (settings.Solver == 2) {
-    solverFunc = solverLib.MidPoint;
-  } else if (settings.Solver == 3) {
-    solverFunc = solverLib.IterativeEuler;
-  } else if (settings.Solver == 4) {
-    solverFunc = solverLib.IterativeMidPoint;
-  } else if (settings.Solver == 5) {
-    solverFunc = solverLib.Verlet;
-  } else if (settings.Solver == 6) {
-    solverFunc = solverLib.VelocityVerlet;
-  }
+  setGlobalSolver();
+  setGlobalLimits();
 
   if (settings.ForceField) {
     drawBox(0, vpMatrix);
@@ -56,6 +45,10 @@ function renderBoxes(vpMatrix) {
   gridBox.adjust(vpMatrix);
   gridBox.draw();
 
+}
+
+function setGlobalLimits() {
+  globalLimitList[0].enabled = settings.sphereEnabled;
 }
 
 function drawBox(id, vpMatrix) {
@@ -93,5 +86,23 @@ function addRandVel() {
         0.2 * INIT_VEL, INIT_VEL,
         0.2 * INIT_VEL, INIT_VEL
     );
+  }
+}
+
+function setGlobalSolver() {
+  if (settings.Solver == 0) {
+    solverFunc = solverLib.Explicit;
+  } else if (settings.Solver == 1) {
+    solverFunc = solverLib.Implicit;
+  } else if (settings.Solver == 2) {
+    solverFunc = solverLib.MidPoint;
+  } else if (settings.Solver == 3) {
+    solverFunc = solverLib.IterativeEuler;
+  } else if (settings.Solver == 4) {
+    solverFunc = solverLib.IterativeMidPoint;
+  } else if (settings.Solver == 5) {
+    solverFunc = solverLib.Verlet;
+  } else if (settings.Solver == 6) {
+    solverFunc = solverLib.VelocityVerlet;
   }
 }

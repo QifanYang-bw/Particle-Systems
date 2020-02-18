@@ -44,15 +44,15 @@ function VboTornado() {
     '  }\n' +
     '}\n';
 
-    this.nParticles = 1000;
+    this.nParticles = 2000;
 
     this.partVec = new PartSys();
 
-    this.forceList = [new TCentripetal(), new RandomBehaviour(4)];
+    this.forceList = [new TCentripetal(), new RandomBehaviour(1)];
 
-    this.limitList = [new AxisDampenWall('x', -10, '+'), new AxisDampenWall('x', 10, '-'),
-                 new AxisDampenWall('y', -10, '+'), new AxisDampenWall('y', 10, '-'),
-                 new AxisDampenWall('z', 0, '+'), new AxisDampenWall('z', 6, '-')];
+    this.limitList = [new AxisWall('x', -10, '+'), new AxisWall('x', 10, '-'),
+                 new AxisWall('y', -10, '+'), new AxisWall('y', 10, '-'),
+                 new AxisWall('z', 0, '+'), new AxisWall('z', 6, '-')];
 
 
     this.partVec.init(this.nParticles, this.forceList, this.limitList);

@@ -2,7 +2,7 @@
 var BoidBehaviour = function() { 
 	CForcer.call(this);
 
-	this.effectDist = 0.5;
+	this.effectDist = 0.8;
 
 	this.p;
 	this.coeff = 20;
@@ -20,6 +20,10 @@ BoidBehaviour.prototype.__swapElement = function(i1, i2) {
 		temp = this.p.s1[loc1 + k];
 		this.p.s1[loc1 + k] = this.p.s1[loc2 + k];
 		this.p.s1[loc2 + k] = temp;
+
+		temp = this.p.s3[loc1 + k];
+		this.p.s3[loc1 + k] = this.p.s3[loc2 + k];
+		this.p.s3[loc2 + k] = temp;
 	}
 
 }
@@ -117,7 +121,6 @@ BoidBehaviour.prototype.__applyForce = function(p) {
 			}
 
 			// Cohesion
-			
 			var vCoh = this._veconIndex(j, i);
 			for (var inc = 0; inc < p.PartDim; inc++) {
 				fCohList[inc] += vCoh[inc];
@@ -133,7 +136,7 @@ BoidBehaviour.prototype.__applyForce = function(p) {
 
 		for (var inc = 0; inc < p.PartDim; inc++) {
 			p.s1[loci + p.PartFLoc] += (
-				fSepList[inc] / dSep + 
+				fSepList[inc] / dSep * 3 + 
 				fAlignList[inc] / dAlign + 
 				fCohList[inc] / dCoh
 			) * 20;

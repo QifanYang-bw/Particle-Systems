@@ -1,3 +1,5 @@
+var globalLimitList;
+
 function randrange(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -50,7 +52,6 @@ PartSys.prototype.init = function(partCount, forceList, limitList) {
 	this.s2 = new Float32Array(this.totalLength);
 	this.s2dot = new Float32Array(this.totalLength);
 	this.s3 = new Float32Array(this.totalLength);
-	// this.sM = new Float32Array(this.totalLength);
 
 	this.forceList = arguments[1];
 	this.limitList = arguments[2];
@@ -203,7 +204,6 @@ PartSys.prototype.applyForces = function() {
 		this.forceList[i].applyForce(this);
 	}
 
-	// console.log('sep');
 	// Calculates s1(xftot, yftot, zftot)
 }
 
@@ -220,6 +220,10 @@ PartSys.prototype.doConstraint = function() {
 
 	for (var i = 0; i < this.limitList.length; i++) {
 		this.limitList[i].applyLimit(this);
+	}
+
+	for (var i = 0; i < globalLimitList.length; i++) {
+		globalLimitList[i].applyLimit(this);
 	}
 
 }

@@ -53,7 +53,7 @@ function VboParticleSys() {
     'varying   vec4 v_Color; \n' +
 
     'void main() {\n' +
-    '  gl_PointSize = 15.0;\n' +            // TRY MAKING THIS LARGER...
+    '  gl_PointSize = 14.0;\n' +            // TRY MAKING THIS LARGER...
     '  gl_Position = u_MvpMatrix * a_Position; \n' +  
 
     '  if(u_runMode == 0) { \n' +    // Let u_runMode determine particle color:
