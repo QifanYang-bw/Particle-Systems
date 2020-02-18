@@ -74,13 +74,13 @@ var SettingsManager = function() {
 
 	this.Solver = 1;
 
-	this.sphereEnabled = true;
+	this.sphereEnabled = false;
 	this.sphereX = 0.0;
 	this.sphereY = 0.0;
 	this.sphereZ = 2.0;
 	this.sphereRad = 1.2;
 
-	this.cylinderEnabled = false;
+	this.cylinderEnabled = true;
 	this.cylinderX = 0.0;
 	this.cylinderY = 0.0;
 	this.cylinderZ = 2.0;

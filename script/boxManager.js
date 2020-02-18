@@ -19,7 +19,7 @@ function initBoxes() {
 
   defaultVec = partBoxArray[0].partVec;
 
-  globalLimitList = [new SphereObject()];
+  globalLimitList = [new SphereObject(), new CylinderObject()];
 
 }
 
@@ -49,6 +49,7 @@ function renderBoxes(vpMatrix) {
 
 function setGlobalLimits() {
   globalLimitList[0].enabled = settings.sphereEnabled;
+  globalLimitList[1].enabled = settings.cylinderEnabled;
 }
 
 function drawBox(id, vpMatrix) {
