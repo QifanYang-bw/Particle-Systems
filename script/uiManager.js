@@ -85,6 +85,6 @@ var SettingsManager = function() {
 	this.cylinderY = 0.0;
 	this.cylinderZ = 2.0;
 	this.cylinderRad = 2.0;
-	this.cylinderHeight = 3.0;
+	this.cylinderHeight = 4.0;
 
 };

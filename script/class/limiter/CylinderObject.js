@@ -25,7 +25,7 @@ CylinderObject.prototype._check = function(i) {
     var x = v[0] - this.pos[0], y = v[1] - this.pos[1];
     var dist = Math.sqrt(x*x + y*y);
 
-    var zdist = v[2] - this.pos[2];
+    var zdist = Math.abs(v[2] - this.pos[2]);
 
     return dist < this.rad && zdist < this.height;
 
@@ -52,7 +52,7 @@ CylinderObject.prototype.__applyLimit = function(p) {
 
 	this.pos = [settings.cylinderX, settings.cylinderY, settings.cylinderZ];
 	this.rad = settings.cylinderRad;
-	this.height = settings.cylinderHeight;
+	this.height = settings.cylinderHeight * .5;
 
 	this.p = p;
 
