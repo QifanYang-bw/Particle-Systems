@@ -445,13 +445,8 @@ function displayMe() {
 // Print current state of the particle system on the webpage:
 	var recipTime = 1000.0 / g_timeStep;			// to report fractional seconds
 	var recipMin  = 1000.0 / g_timeStepMin;
-	var recipMax  = 1000.0 / g_timeStepMax; 
-	var solvType;												// convert solver number to text:
-	if(g_solver==0) solvType = 'Explicit--(unstable!)<br>';
-	else 						solvType = 'Implicit--(stable)<br>'; 
-	var bounceType;											// convert bounce number to text
-	if(g_bounce==0) bounceType = 'Velocity Reverse(no rest)<br>';
-	else 						bounceType = 'Impulsive (will rest)<br>';
+	var recipMax  = 1000.0 / g_timeStepMax;
+
 	var xvLimit = xvelNow;							// find absolute values of xvelNow
 	if(xvelNow < 0.0) xvLimit = -xvelNow;
 	var yvLimit = yvelNow;							// find absolute values of yvelNow
@@ -460,16 +455,13 @@ function displayMe() {
 	if(zvelNow < 0.0) zvLimit = -zvelNow;
 	
 	document.getElementById('KeyResult').innerHTML = 
-   			'<b>Solver = </b>' + solvType + 
-   			'<b>Bounce = </b>' + bounceType +
-   			'<b>Particle #0:</b> <b>drag = </b>' + g_drag.toFixed(5) + 
-   			', <b>grav = </b>' + g_grav.toFixed(5) +
-   			' m/s^2; <b>xVel = +/-</b> ' + xvLimit.toFixed(5) + 
-   			' m/s; <b>yVel = +/-</b> ' + yvLimit.toFixed(5) + 
-   			' m/s; <b>zVel = +/-</b> ' + zvLimit.toFixed(5) + 
-   			' m/s;<br><b>timeStep = </b> 1/' + recipTime.toFixed(3) + ' sec' +
-   			                ' <b>min:</b> 1/' + recipMin.toFixed(3)  + ' sec' + 
-   			                ' <b>max:</b> 1/' + recipMax.toFixed(3)  + ' sec<br>' +
+   			'<b>Particle #0:' +
+        '</br> <b>xVel = +/-</b> ' + xvLimit.toFixed(3) + 
+   			' m/s;</br> <b>yVel = +/-</b> ' + yvLimit.toFixed(3) + 
+   			' m/s;</br> <b>zVel = +/-</b> ' + zvLimit.toFixed(3) + 
+   			' m/s;</br> </br> <b>timeStep = </b> 1/' + recipTime.toFixed(3) + ' sec' +
+   			                '</br>  <b>min:</b> 1/' + recipMin.toFixed(3)  + ' sec' + 
+   			                '</br>  <b>max:</b> 1/' + recipMax.toFixed(3)  + ' sec<br>' +
    			'';//' <b>s1Array: </b>' + partVec.s1 ;
 
     // console.log(partVec.s1);

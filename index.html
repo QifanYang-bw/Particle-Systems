@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Activity Week 3 -- A Single Spring</title>
+    <title>Project A: System of Particle Systems</title>
     <style>
       body {
         background: #191919;
@@ -96,43 +96,61 @@
     <div class="mainLocal">
 
       <div class="textTitle spacebetween">
-        <div><h2>Activity Week 2 - 3D Bouncy Ball</h2></div>
+        <div><h2>Project A: System of Particle Systems</h2></div>
         <div class="author">
           Qifan Yang: QYL123
         </div>
       </div>
-      * One particle has twice amount of mass compared to the other particle.
-      <br>
-      <br>
-    	<b>Particle System Controls</b>  (Some of them doesn't work):
-      <br>
-      <b>r key:</b> Add velocity; 
-      <b>Key '0':</b> Stop;
-      <b>Key '1':</b> Pause; 
-      <b>Key '2':</b> Stepping; 
-      <b>Key '3':</b> Resume. 
-<!--     	<br>
-      <b>c or C key:</b> toggle clear-screen.  
-    	<b>d/D key:</b> less/more drag.  
-      <b>g/G key:</b> less/more gravity <br>
-      <b>s or S: switch solvers</b> (implicit vs. explicit)
-      <br>
-      <b>b or B:</b> floor-bounce method  -->
-    	<!-- Make 'div' elements to hold changeable HTML made in our JavaScript file;
-    		 (where? look at the end of 'BouncyBall03.js' at 
-    			myKeyPress(), myKeyDown() and myKeyUp() fcns)
-    	-->
-    	<p>
-    		<div id='KeyResult'> try it... </div>
-    		<div id='MouseResult0'> Then look here... </div> 
-    		<div id='MouseResult1'> And look here too... </div>
-      </p>
-    	<p>
-          <button type="button" onclick="onPlusButton()" >++Start</button>
-          <button type="button" onclick="onMinusButton()">--Start</button>
-    		Buttons adjust 'r' or 'R' key strength <br>
-    		Open Console, please (right-click-->'Inspect Element'-->'Console' tab) 		
-    	</p>
+
+      <div >
+        <h3> User Instructions <br /></h3>
+        <div id="sentence">
+
+          - Use the control panel on the right side to adjust most of the settings.
+
+        </div>
+        <h3> Keyboard Instructions <br /></h3>
+        <div id="sentence">
+
+          - 'R': Add Random Velocity to every Particles on canvas. </br>
+          </br>
+          - 'WASD': Perspective Translate.</br>
+          - 'IJKL': Perspective Rotation.</br>
+          </br>
+          - '0': Stop animation.</br>
+          - '1': Pause animation.</br>
+          - '2': Move animation by one frame.</br>
+          - 'H': Resume animation.</br>
+
+        </div>
+        <h3> Credits <br /></h3>
+        <div id="sentence">
+
+          - The initial code is given by Prof. John Tumblin from Northwestern University. </br>
+
+        </div>
+      </div>
+
+      <div id='DebugInfo' > 
+        <h3>
+          <h3>Debug Info</h3>
+        </h3>
+        <div class="spacebetween">
+          <div class='width33'>
+            <b> KeyPress Event </b><br>
+            <div id='KeyResult' class='stdHeight'> </div> <!-- myKeyDown() modifies this object -->
+          </div>
+          <div class='width33'>
+            <b> Mouse Location </b>
+            <div id='MouseResult0' class='stdHeight'></div>  <!-- myMouseMove() modifies this object -->
+          </div> 
+          <div class='width33'>
+            <b> Mouse Drag Direction </b>
+            <div id='MouseResult1' class='stdHeight'></div> <!-- myMouseUp() modifies this object -->
+           </div> 
+        </div>
+      </div>
+
     </div>
 
   <!--  Load dat gui Library -->
