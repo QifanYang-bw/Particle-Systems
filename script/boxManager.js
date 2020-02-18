@@ -1,5 +1,8 @@
 var solverFunc;
 
+var VboCount = 4;
+var VerletVboRecord = [false, false, false, false];
+
 function initBoxes() {
 
   gridBox = new VboGrid();
@@ -17,7 +20,6 @@ function initBoxes() {
     if (partBoxArray[i] != null) partBoxArray[i].init();
   }
 
-  defaultVec = partBoxArray[0].partVec;
 
   globalLimitList = [new SphereObject(), new CylinderObject()];
 
@@ -31,18 +33,19 @@ function renderBoxes(vpMatrix) {
   setGlobalForces();
   setGlobalLimits();
 
-  if (settings.ForceField) {
-    drawBox(0, vpMatrix);
+  var NewVboRecord = [settings.ForceField, settings.Boid, settings.Flame, settings.Springs];
+
+  for (var i = 0; i < VboCount; i++) {
+    if (NewVboRecord[i]) {
+      if (NewVboRecord[i] != VerletVboRecord[i]) {
+        VerletFirstFrame = true;
+      }
+      defaultVec = partBoxArray[i].partVec;
+      drawBox(i, vpMatrix);
+    }
   }
-  if (settings.Boid) {
-    drawBox(1, vpMatrix);
-  }
-  if (settings.Flame) {
-    drawBox(2, vpMatrix);
-  }
-  if (settings.Springs) {
-    drawBox(3, vpMatrix);
-  }
+
+  VerletVboRecord = NewVboRecord;
 
   gridBox.switchToMe();
   gridBox.adjust(vpMatrix);
@@ -109,6 +112,9 @@ function setGlobalSolver() {
   } else if (settings.Solver == 4) {
     solverFunc = solverLib.IterativeMidPoint;
   } else if (settings.Solver == 5) {
+    if (solverFunc != solverLib.Verlet) {
+        VerletFirstFrame = true;
+    }
     solverFunc = solverLib.Verlet;
   } else if (settings.Solver == 6) {
     solverFunc = solverLib.VelocityVerlet;

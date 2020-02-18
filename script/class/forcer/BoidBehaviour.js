@@ -21,9 +21,24 @@ BoidBehaviour.prototype.__swapElement = function(i1, i2) {
 		this.p.s1[loc1 + k] = this.p.s1[loc2 + k];
 		this.p.s1[loc2 + k] = temp;
 
-		temp = this.p.s3[loc1 + k];
-		this.p.s3[loc1 + k] = this.p.s3[loc2 + k];
-		this.p.s3[loc2 + k] = temp;
+		if (!(solverFunc == solverLib.Explicit || solverFunc == solverLib.Implicit)) {
+			temp = this.p.s1dot[loc1 + k];
+			this.p.s1dot[loc1 + k] = this.p.s1dot[loc2 + k];
+			this.p.s1dot[loc2 + k] = temp;
+
+			temp = this.p.s2[loc1 + k];
+			this.p.s2[loc1 + k] = this.p.s2[loc2 + k];
+			this.p.s2[loc2 + k] = temp;
+
+			temp = this.p.s2dot[loc1 + k];
+			this.p.s2dot[loc1 + k] = this.p.s2dot[loc2 + k];
+			this.p.s2dot[loc2 + k] = temp;
+			
+			temp = this.p.s3[loc1 + k];
+			this.p.s3[loc1 + k] = this.p.s3[loc2 + k];
+			this.p.s3[loc2 + k] = temp;
+		}
+
 	}
 
 }

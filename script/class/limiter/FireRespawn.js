@@ -49,7 +49,7 @@ FireRespawn.prototype.__applyLimit = function(p) {
 					this.spawnVelMin[inc],
 					this.spawnVelMax[inc]
 				);
-
+				
 			}
 
 			for (var inc = 0; inc < p.PartColorDim; inc++) {

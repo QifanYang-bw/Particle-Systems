@@ -202,7 +202,6 @@ solverLib.IterativeMidPoint = function (obj) {
 
 }
 
-
 var VerletFirstFrame = true;
 
 solverLib.Verlet = function (obj) {

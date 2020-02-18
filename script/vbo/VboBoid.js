@@ -4,7 +4,7 @@ function VboBoid() {
 
     VboParticleSys.call(this);
 
-    this.nParticles = 200;
+    this.nParticles = 500;
 
     this.partVec = new PartSys();
 
