@@ -34,6 +34,8 @@ FireRespawn.prototype.__applyLimit = function(p) {
 
 	var j = 0;
 
+	var t = g_timeStep * 0.001;
+	
 	for (var i = 0; i < p.partCount; i++, j+=p.PartObjectSize) {
 
 		if (p.s2[j + p.PartAgeSingle] > this.ageLimit) {
@@ -57,6 +59,16 @@ FireRespawn.prototype.__applyLimit = function(p) {
 				p.s1dot[p.PartColorLoc + j + inc] = (this.dyingColor[inc] - this.spawnColor[inc]) / p.s2[j + p.PartAgeSingle];// * randrange(0.8, 1.2);
 			}
 
+			if (solverFunc == solverLib.Verlet) {
+				// Special, Temporary reverse solver for Verlet
+				// Verlet really messes up things...
+
+				console.log('hi');
+
+				for (var inc = 0; inc < p.PartDim; inc++) {
+					p.s3[p.PartPosLoc + j + inc] = p.s2[p.PartPosLoc + j + inc] - p.s2[p.PartVelLoc + j + inc] * t;
+				}
+			}
 			// console.log(p.s2.slice(j, j + p.PartObjectSize));
 
 		}
